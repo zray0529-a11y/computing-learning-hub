@@ -1,0 +1,19 @@
+# Reader-owned learning notes and work products
+learning/
+*.local.md
+
+# Local credentials and environment
+.env
+.env.*
+.venv/
+venv/
+
+# Python and operating-system caches
+__pycache__/
+*.py[cod]
+.DS_Store
+Thumbs.db
+
+# Temporary outputs
+outputs/
+tmp/
