@@ -6,25 +6,25 @@ export const atlasCategories = [
   {
     id: 'foundation',
     label: '表示与计算',
-    color: '#578c73',
+    color: '#34d399',
     summary: '从 0 与 1 到机器和程序：规则怎样执行，数据怎样组织，代价怎样增长。',
   },
   {
     id: 'systems',
     label: '系统与协作',
-    color: '#628cad',
+    color: '#60a5fa',
     summary: '程序怎样共享资源、交换消息、保存数据，并让变化可检查、故障可追踪。',
   },
   {
     id: 'intelligence',
     label: '学习与智能',
-    color: '#9376af',
+    color: '#a78bfa',
     summary: '从数据拟合到生成、检索和工具行动，逐步分清模型能力与外部证据。',
   },
   {
     id: 'spatial',
     label: '建筑与空间',
-    color: '#c58b55',
+    color: '#fbbf24',
     summary: '把位置、形体、对象身份和带时间的观察连接起来，分别检查它们的含义。',
   },
 ];

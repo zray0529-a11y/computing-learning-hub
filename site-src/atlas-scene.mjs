@@ -342,7 +342,8 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       label.style.setProperty('--node-color', color);
       label.addEventListener('click', () => { if (!disposed && !failed) onSelect(node.id); });
       labelLayer.append(label);
-      const record = { node, group, label, ring, marker, surfaces: surfaces.map((surface) => ({ surface, color: surface.color.clone() })), anchor: new T.Vector3(), visible: true };
+      const nightColors = [new T.Color(color), new T.Color(color).lerp(new T.Color('#14251c'), 0.55), new T.Color(color).lerp(new T.Color('#0e1914'), 0.85), new T.Color(color).multiplyScalar(0.34)];
+      const record = { node, group, label, ring, marker, surfaces: surfaces.map((surface, index) => ({ surface, color: surface.color.clone(), nightColor: nightColors[index] })), anchor: new T.Vector3(), visible: true };
       records.set(node.id, record);
       scene.add(group);
     }
@@ -369,7 +370,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     }
 
     function platform(centerX, centerZ, sizeX, sizeZ, color) {
-      const deckSurface = themed(material(color, { roughness: 0.95 }), tint(color, 0.94), new T.Color(color).lerp(new T.Color('#15231c'), 0.86));
+      const deckSurface = themed(material(color, { roughness: 0.95 }), tint(color, 0.96), new T.Color(color).lerp(new T.Color('#0e1914'), 0.98));
       const deck = mesh(scenery, box(sizeX, 0.13, sizeZ), deckSurface, centerX, -0.08, centerZ);
       const x = sizeX / 2, z = sizeZ / 2;
       const border = polyline(scenery, [[-x, -z], [x, -z], [x, z], [-x, z], [-x, -z]].map(([a, b]) => new T.Vector3(centerX + a, 0.005, centerZ + b)), tint(color, 0.5), 0.62);
@@ -505,9 +506,11 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
         record.group.visible = record.visible;
         record.ring.visible = focused || selected || hoveredId === id;
         record.marker.visible = selected;
-        record.surfaces.forEach(({ surface, color }) => {
-          surface.color.copy(color);
-          if (muted) surface.color.lerp(new T.Color(isDark ? '#263e33' : '#f1f4f7'), 0.71);
+        record.surfaces.forEach(({ surface, color, nightColor }, index) => {
+          surface.color.copy(isDark ? nightColor : color);
+          if (muted) surface.color.lerp(new T.Color(isDark ? '#142a20' : '#f1f4f7'), isDark ? 0.66 : 0.71);
+          // A small emissive accent keeps selected colors clear without a bloom pass.
+          surface.emissive?.copy(surface.color).multiplyScalar(isDark && !muted && (selected || focused) ? (index === 0 ? 0.12 : 0.025) : 0);
         });
         record.label.classList.toggle('is-selected', selected);
         record.label.classList.toggle('is-focused', focused);
@@ -520,7 +523,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
         const withinFocus = focusSet.has(edge.from) && focusSet.has(edge.to);
         const showing = endpointsVisible && (state.mode === 'scenario' ? (!hasFocus || withinFocus) : (!state.selectedId || selected));
         line.visible = showing;
-        line.material.color.copy(isDark ? tint(color, 0.3) : color);
+        line.material.color.copy(isDark ? tint(color, 0.18) : color.clone().multiplyScalar(0.36));
         line.material.opacity = selected ? 0.86 : withinFocus ? 0.7 : 0.24;
         if (arrow) {
           arrow.visible = showing;
@@ -531,12 +534,12 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       districtLabels.forEach(({ element, eventId, color }) => {
         if (eventId) {
           element.classList.toggle('is-selected', eventId === state.eventId);
-          element.style.color = eventId === state.eventId ? (isDark ? '#efbb9c' : '#9b4e2a') : (isDark ? '#9caeba' : '#718194');
-        } else element.style.color = isDark ? '#' + tint(color, 0.38).getHexString() : color;
+          element.style.color = eventId === state.eventId ? (isDark ? '#fbbf24' : '#92400e') : (isDark ? '#9cb8a9' : '#4b6356');
+        } else element.style.color = '#' + (isDark ? new T.Color(color) : new T.Color(color).multiplyScalar(0.23)).getHexString();
       });
       eventMarkers.forEach(({ id, marker }) => {
         const current = id === state.eventId;
-        marker.material.color.set(current ? (isDark ? '#efbb9c' : '#bb7753') : '#9ba9b7');
+        marker.material.color.set(current ? (isDark ? '#fbbf24' : '#b45309') : '#9ba9b7');
         marker.scale.setScalar(current ? 1.65 : 1);
       });
     }
@@ -544,7 +547,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     function applyAtlasTheme() {
       if (disposed || failed) return;
       isDark = doc.documentElement.dataset.theme === 'dark';
-      scene.background = new T.Color(isDark ? '#0b1510' : '#f4f8f5');
+      scene.background = new T.Color(isDark ? '#0b1510' : '#ecf4ee');
       renderer.setClearColor(scene.background, 1);
       themedMaterials.forEach((colors, surface) => surface.color.copy(isDark ? colors.dark : colors.light));
       applyState();

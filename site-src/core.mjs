@@ -47,7 +47,7 @@ export function searchDocuments(documents, query) {
 }
 
 export function restoreProgress(raw, knownPaths) {
-  const fresh = {read:[],bookmarks:[],last:null,positions:{},views:{},theme:'light'};
+  const fresh = {read:[],bookmarks:[],last:null,positions:{},views:{},theme:'dark'};
   let parsed;
   try { parsed=JSON.parse(raw); } catch { return fresh; }
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return fresh;
@@ -55,7 +55,7 @@ export function restoreProgress(raw, knownPaths) {
     if (Array.isArray(parsed[key])) fresh[key]=[...new Set(parsed[key].filter(path=>typeof path==='string'&&knownPaths.has(path)))];
   }
   if (knownPaths.has(parsed.last)) fresh.last=parsed.last;
-  if (parsed.theme==='dark') fresh.theme='dark';
+  if (parsed.theme==='dark'||parsed.theme==='light') fresh.theme=parsed.theme;
   if (parsed.positions && typeof parsed.positions==='object' && !Array.isArray(parsed.positions)) {
     for (const [path,fraction] of Object.entries(parsed.positions)) {
       if (knownPaths.has(path) && typeof fraction==='number' && Number.isFinite(fraction)) fresh.positions[path]=Math.max(0,Math.min(1,fraction));

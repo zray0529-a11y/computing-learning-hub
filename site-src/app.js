@@ -66,6 +66,7 @@
   }
   function setTheme() {
     document.documentElement.dataset.theme=state.theme;
+    document.querySelector('meta[name="theme-color"]').content=state.theme==='dark'?'#070d0a':'#f6faf7';
     const toggle=document.getElementById('theme-toggle');
     toggle.innerHTML=icon(state.theme==='dark'?'sun':'moon');
     toggle.setAttribute('aria-label',state.theme==='dark'?'切换为浅色主题':'切换为深色主题');

@@ -51,7 +51,10 @@ test('damaged storage and unknown document IDs do not break the reader', () => {
   assert.equal(state.last,null);
   assert.equal(state.positions['README.md'],0.5);
   assert.equal(state.positions['docs/07-glossary.md'],1);
-  assert.equal(state.theme,'light');
+  assert.equal(state.theme,'dark');
+  assert.equal(restoreProgress(null,paths).theme,'dark');
+  assert.equal(restoreProgress(JSON.stringify({theme:'light'}),paths).theme,'light');
+  assert.equal(restoreProgress(JSON.stringify({theme:'dark'}),paths).theme,'dark');
 });
 
 test('the built reader preserves all lessons, folded answers, diagrams and local targets', () => {
