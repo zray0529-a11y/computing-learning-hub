@@ -4,12 +4,21 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {Marked} from '../site-src/vendor/marked.mjs';
 import {escapeHtml,headingSlug,resolveLink} from '../site-src/core.mjs';
+import {validateLesson} from '../site-src/visual-core.mjs';
+import {lessons as foundations} from '../site-src/lessons/foundations.mjs';
+import {lessons as systems} from '../site-src/lessons/systems.mjs';
+import {lessons as architecture} from '../site-src/lessons/architecture.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 const read=p=>readFileSync(path.join(root,p),'utf8');
 const catalog=JSON.parse(read('site-src/catalog.json'));
 const diagrams=JSON.parse(read('site-src/diagrams.json'));
 const known=new Set(catalog.documents.map(d=>d.path));
+const lessons=[...foundations,...systems,...architecture];
+const visuals=new Map(lessons.map(lesson=>[lesson.path,lesson]));
+const expectedVisuals=catalog.documents.filter(doc=>doc.number&&(doc.group==='chapters'||doc.group==='architecture'));
+if(visuals.size!==18||lessons.length!==18||expectedVisuals.some(doc=>!visuals.has(doc.path))) throw new Error('Every one of the 18 core topics needs a visual lesson');
+for(const lesson of lessons)validateLesson(lesson,known);
 if(known.size!==catalog.documents.length) throw new Error('Duplicate document in public catalog');
 const plain=html=>html.replace(/<[^>]*>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'");
 const digest=text=>createHash('sha256').update(text).digest('hex');
@@ -60,7 +69,7 @@ for(const entry of catalog.documents) {
     html=parser.parse(source).replace(/<table>/g,'<div class="table-wrap" tabindex="0" role="region" aria-label="可横向滚动的表格"><table>').replace(/<\/table>/g,'</table></div>');
   }
   const text=plain(html).replace(/\s+/g,' ').trim();
-  documents.push({...entry,html,text,source,headings,minutes:Math.max(1,Math.ceil(source.replace(/\s/g,'').length/650))});
+  documents.push({...entry,html,text,source,headings,visual:visuals.get(entry.path)||null,minutes:Math.max(1,Math.ceil(source.replace(/\s/g,'').length/650))});
 }
 
 // Validate actual generated links and fragments before publishing.
@@ -72,17 +81,19 @@ for(const doc of documents) for(const match of doc.html.matchAll(/href="(#doc=[^
   if(route.has('section')&&!target.headings.some(h=>h.id===route.get('section'))) throw new Error('Missing heading: '+doc.path+' -> '+match[1]);
 }
 const core=read('site-src/core.mjs').replace(/^export /gm,'');
+const visualCore=read('site-src/visual-core.mjs').replace(/^export /gm,'');
+const visualReader=read('site-src/visual-reader.mjs').replace(/^import .*;\n/gm,'').replace(/^export /gm,'');
 const app=read('site-src/app.js');
-const css=read('site-src/styles.css');
-const version=digest(JSON.stringify(documents)+core+app+css).slice(0,12);
+const css=read('site-src/styles.css')+'\n'+read('site-src/visual.css');
+const version=digest(JSON.stringify(documents)+core+visualCore+visualReader+app+css).slice(0,12);
 const data={version,groups:catalog.groups,documents,repo:'https://github.com/zray0529-a11y/computing-learning-hub'};
 const json=JSON.stringify(data).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
 const html=read('site-src/template.html')
   .replace('/* STYLES */',()=>css)
   .replace('<!-- KNOWLEDGE_DATA -->',()=>'<script id="knowledge-data" type="application/json">'+json+'</script>')
-  .replace('/* APP_SCRIPT */',()=>core+'\n'+app);
+  .replace('/* APP_SCRIPT */',()=>core+'\n'+visualCore+'\n'+visualReader+'\n'+app);
 if(/<script[^>]+src=|<link[^>]+(?:stylesheet|preload)/i.test(html)) throw new Error('External runtime asset defeats offline delivery');
 mkdirSync(path.join(root,'_site'),{recursive:true});
 writeFileSync(path.join(root,'_site/index.html'),html);
 writeFileSync(path.join(root,'_site/.nojekyll'),'');
-console.log(JSON.stringify({documents:documents.length,chapters:14,architectureTopics:4,inlineDiagrams:Object.keys(diagrams).length,bytes:Buffer.byteLength(html),version}));
+console.log(JSON.stringify({documents:documents.length,chapters:14,architectureTopics:4,inlineDiagrams:Object.keys(diagrams).length,visualLessons:lessons.length,bytes:Buffer.byteLength(html),version}));

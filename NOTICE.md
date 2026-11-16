@@ -4,10 +4,10 @@
 
 | 内容 | 许可 |
 |---|---|
-| 原创教学正文、表格、练习说明与模板 | [Creative Commons Attribution 4.0 International](LICENSE-DOCS)，简称CC BY 4.0 |
+| 原创教学正文、表格、练习说明、模板，以及 `site-src/lessons/` 内的教学文字和机制图 | [Creative Commons Attribution 4.0 International](LICENSE-DOCS)，简称CC BY 4.0 |
 | 原创`.py`文件及文档中的原创可执行代码示例 | [MIT License](LICENSE) |
 | 第三方论文、标准、官方文档、商标与外部链接目标 | 保留其原有权利与许可，本项目不为它们重新授权 |
-| 原创网页界面、JavaScript、CSS、HTML 模板、构建脚本与测试 | [MIT License](LICENSE)；生成页面内的教材正文仍采用 CC BY 4.0 |
+| 原创网页界面、JavaScript、CSS、HTML 模板、构建脚本与测试 | [MIT License](LICENSE)；生成页面内的教材正文与教学机制图仍采用 CC BY 4.0 |
 | 随源码分发的 marked 17.0.5 | 原项目 MIT 许可，完整声明保留于网站源码的 vendor 目录 |
 
 Copyright (c) 2026 Computing Learning Hub contributors.

@@ -47,7 +47,7 @@ export function searchDocuments(documents, query) {
 }
 
 export function restoreProgress(raw, knownPaths) {
-  const fresh = {read:[],bookmarks:[],last:null,positions:{},theme:'light'};
+  const fresh = {read:[],bookmarks:[],last:null,positions:{},views:{},theme:'light'};
   let parsed;
   try { parsed=JSON.parse(raw); } catch { return fresh; }
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return fresh;
@@ -60,6 +60,9 @@ export function restoreProgress(raw, knownPaths) {
     for (const [path,fraction] of Object.entries(parsed.positions)) {
       if (knownPaths.has(path) && typeof fraction==='number' && Number.isFinite(fraction)) fresh.positions[path]=Math.max(0,Math.min(1,fraction));
     }
+  }
+  if(parsed.views&&typeof parsed.views==='object'&&!Array.isArray(parsed.views)) {
+    for(const [path,view] of Object.entries(parsed.views))if(knownPaths.has(path)&&['visual','full'].includes(view))fresh.views[path]=view;
   }
   return fresh;
 }

@@ -87,29 +87,14 @@
     return '<a class="course-row'+(read?' read':'')+'" href="'+route(doc.path)+'"><span class="course-index">'+(read?'✓':esc(doc.number||'↗'))+'</span><div class="course-body"><h3 class="course-title">'+esc(doc.title)+'</h3><p class="course-description">'+esc(doc.description||groups.get(doc.group)||'')+'</p></div>'+icon('arrow','course-arrow')+'</a>';
   }
   function renderHome() {
-    document.title='计算机学习知识库 · 从理解到实践';
-    document.getElementById('breadcrumb-current').textContent='学习首页';
-    const resume=byPath.get(state.last);
-    const first=chapters[0];
-    const readCount=chapters.filter(doc=>state.read.includes(doc.path)).length;
-    const preview=[['01','表示与计算','让信息成为可以处理的数据',chapters[0].path],['02','程序与系统','理解软件怎样运行与协作',chapters[2].path],['03','数据与智能','从存储、检索到模型与 Agent',chapters[6].path],['04','空间与应用','把知识带回真实问题',topics[0].path]];
-    content.innerHTML='<div class="home-wrap">'+
-      '<section class="home-hero"><div class="hero-text"><div class="section-eyebrow"><span class="status-dot"></span> 从 0 与 1，到 AGENT</div><h1>把计算机知识，<br>变成<em>能用的能力。</em></h1><p class="hero-description">一份从基础到应用的开放学习指南。<br>理解原理，动手验证，再用自己的话讲清楚。</p><div class="hero-buttons"><a class="primary-button" href="'+route(first.path)+'">开始学习'+icon('arrow')+'</a><a class="text-link" href="'+route('docs/02-history-and-map.md')+'">先看看知识地图'+icon('arrowUp')+'</a></div></div>'+
-      '<div class="path-preview"><div class="path-preview-title">一条清晰的学习路径</div><div class="path-steps">'+preview.map(p=>'<a class="path-step" href="'+route(p[3])+'"><span class="path-step-circle">'+p[0]+'</span><span><strong>'+p[1]+'</strong><small>'+p[2]+'</small></span></a>').join('')+'</div></div></section>'+
-      '<div class="hero-stats"><div class="stat"><strong>14</strong><span>基础课程</span></div><div class="stat"><strong>04</strong><span>建筑与空间专题</span></div><div class="stat"><strong>06</strong><span>动手实验</span></div><div class="stat"><strong>12</strong><span>周建议计划</span></div></div>'+
-      '<section aria-labelledby="today-title"><div class="section-heading"><div><h2 id="today-title">今天，从哪里开始？</h2><p>按顺序打基础，也可以从一个问题切入。</p></div></div><div class="quick-grid">'+
-      '<a class="quick-card featured" href="'+route(resume?resume.path:first.path)+(resume?'&resume=1':'')+'"><div class="quick-card-icon">'+icon(resume?'clock':'book')+'<span>'+(resume?'继续阅读':'第一次来')+'</span></div><h3>'+esc(resume?resume.title:'从第一章开始')+'</h3><p>'+(resume?'回到上次停下的位置，接着往下学。':'从一个最小实验，认识计算、逻辑与信息。')+'</p>'+icon('arrow','quick-card-arrow')+'</a>'+
-      '<button class="quick-card" type="button" data-search><div class="quick-card-icon">'+icon('search')+'<span>随时查阅</span></div><h3>查一个概念</h3><p>API、数据库、RAG…<br>从全库正文找到解释。</p>'+icon('arrow','quick-card-arrow')+'</button>'+
-      '<a class="quick-card" href="'+route('docs/04-learning-plan.md')+'"><div class="quick-card-icon">'+icon('compass')+'<span>循序渐进</span></div><h3>跟着 12 周计划学</h3><p>每周一个重点，<br>把理解变成可验证的进步。</p>'+icon('arrow','quick-card-arrow')+'</a></div></section>'+
-      '<section aria-labelledby="courses-title"><div class="section-heading"><div><h2 id="courses-title">计算机基础</h2><p>从底层原理到智能系统，逐步连接你的知识。</p></div><span class="section-kicker">已读 '+readCount+' / 14</span></div><div class="course-grid">'+chapters.map(courseRow).join('')+'</div></section>'+
-      '<section aria-labelledby="architecture-title"><div class="section-heading"><div><h2 id="architecture-title">在建筑与空间中应用</h2><p>用熟悉的专业问题，练习新的计算机方法。</p></div><a class="text-link" href="'+route('architecture/README.md')+'">专题导读'+icon('arrow')+'</a></div><div class="architecture-grid">'+topics.map((doc,i)=>'<a class="architecture-card" href="'+route(doc.path)+'"><div class="architecture-icon">'+icon(['building','nodes','map','cube'][i])+'</div><h3>'+esc(doc.title)+'</h3><p>'+esc(doc.description)+'</p></a>').join('')+'</div></section>'+
-      '<section class="method-banner">'+icon('spark')+'<div><h3>读懂之后，再向前一步。</h3><p>闭卷回忆 → 用自己的话解释 → 动手验证 → 间隔复习。<br>让“看过了”，慢慢变成“能做出来”。</p></div><a class="text-link" href="'+route('docs/03-learning-method.md')+'">学习方法'+icon('arrow')+'</a></section>'+
-      '<p class="home-note">'+icon('shield')+'阅读位置、收藏和已读标记只保存在当前浏览器；“已读”不代表已掌握。'+(location.protocol==='file:'?' 你正在使用离线文件。':'')+'</p></div>';
+    document.title='计算机学习知识库 · 图解版';
+    document.getElementById('breadcrumb-current').textContent='图解学习首页';
+    content.innerHTML=renderVisualHome(data,state);
   }
   function tocMarkup(doc) {
     return doc.headings.filter(h=>h.depth===2||h.depth===3).map(h=>'<a class="toc-link depth-'+h.depth+'" href="'+route(doc.path,h.id)+'" data-heading="'+esc(h.id)+'">'+esc(h.text)+'</a>').join('');
   }
-  function renderDocument(doc) {
+  function renderDocument(doc,params) {
     document.title=doc.title+' · 计算机学习知识库';
     document.getElementById('breadcrumb-current').textContent=doc.title;
     const read=state.read.includes(doc.path);
@@ -118,17 +103,23 @@
     const current=siblings.findIndex(d=>d.path===doc.path);
     const previous=current>0?siblings[current-1]:null;
     const next=current>=0?siblings[current+1]:null;
-    const toc=tocMarkup(doc);
-    content.innerHTML='<div class="reading-layout"><div class="reading-main">'+
+    const view=resolveReadingMode(params,Boolean(doc.visual),state.views[doc.path]);
+    state.views[doc.path]=view;save();
+    const visual=view==='visual';
+    const visualSections=[['visual-explainer','看图理解'],...(doc.visual?.lab?[['visual-lab','动手试一下']]:[]),['visual-boundary','容易想错的地方'],['visual-check','预测与自测'],['visual-next','继续连接知识']];
+    const toc=visual?visualSections.map(([id,title])=>'<a class="toc-link" href="'+route(doc.path,id)+'" data-heading="'+id+'">'+title+'</a>').join('')+'<a class="toc-link toc-full" href="'+route(doc.path)+'&view=full">阅读完整教材 ↗</a>':tocMarkup(doc);
+    content.innerHTML='<div class="reading-layout'+(visual?' visual-layout':'')+'"><div class="reading-main">'+
       '<div class="article-tools"><div class="article-category">'+esc(groups.get(doc.group))+'<span class="article-minutes">约 '+doc.minutes+' 分钟 · 可离线阅读</span></div><div class="article-actions">'+
       '<button type="button" class="small-action'+(bookmarked?' selected':'')+'" id="bookmark-page" aria-pressed="'+bookmarked+'">'+icon('bookmark')+(bookmarked?'已收藏':'收藏')+'</button>'+
       '<button type="button" class="small-action'+(read?' selected':'')+'" id="mark-read" aria-pressed="'+read+'">'+icon('check')+(read?'已读':'标记已读')+'</button></div></div>'+
-      (toc?'<details class="mobile-toc"><summary>本页目录</summary>'+toc+'</details>':'')+
-      '<article class="prose" id="article">'+doc.html+'</article>'+
+      (doc.visual?'<nav class="reading-modes" aria-label="阅读方式"><a href="'+route(doc.path)+'&view=visual"'+(visual?' aria-current="page"':'')+'>◈ 先看图解</a><a href="'+route(doc.path)+'&view=full"'+(!visual?' aria-current="page"':'')+'>☷ 完整教材</a><span>同一章，两种读法</span></nav>':'')+
+      (toc&&!visual?'<details class="mobile-toc"><summary>本页目录</summary>'+toc+'</details>':'')+
+      (visual?renderVisualLesson(doc,byPath):'<article class="prose" id="article">'+doc.html+'</article>')+
       '<div class="article-end"><div class="article-end-top"><p>试着合上页面，用自己的话讲清一个要点。</p><button class="secondary-button" type="button" data-mark-read>'+icon('check')+(read?'已标记读过':'标记本篇已读')+'</button></div>'+
       '<div class="page-neighbors">'+(previous?'<a class="page-neighbor" href="'+route(previous.path)+'"><small>← 上一篇</small><strong>'+esc(previous.title)+'</strong></a>':'<span></span>')+(next?'<a class="page-neighbor next" href="'+route(next.path)+'"><small>下一篇 →</small><strong>'+esc(next.title)+'</strong></a>':'<a class="page-neighbor next" href="#home"><small>回到学习首页 →</small><strong>继续探索知识库</strong></a>')+'</div>'+
       '<div class="reading-source"><button type="button" data-download-source>下载本页'+(doc.path.endsWith('.md')?' Markdown':'原文')+'</button><a href="'+data.repo+'/blob/main/'+doc.path.split('/').map(encodeURIComponent).join('/')+'" target="_blank" rel="noopener noreferrer">在 GitHub 查看源文件 ↗</a><span>内容来源与许可见页脚</span></div></div></div>'+
       (toc?'<aside class="reading-toc" aria-label="本页目录"><h2 class="toc-title">本页目录</h2>'+toc+'</aside>':'')+'</div>';
+    if(visual)bindVisualReader(document.getElementById('visual-reader'),doc.visual);
     if(tocObserver)tocObserver.disconnect();
     if('IntersectionObserver' in window) {
       tocObserver=new IntersectionObserver(entries=>{
@@ -137,7 +128,7 @@
         const id=visible[0].target.id;
         content.querySelectorAll('.toc-link').forEach(link=>link.classList.toggle('current',link.dataset.heading===id));
       },{rootMargin:'-85px 0px -60% 0px'});
-      content.querySelectorAll('.prose h2,.prose h3').forEach(heading=>tocObserver.observe(heading));
+      content.querySelectorAll('.prose h2,.prose h3,.visual-reader section[id]').forEach(heading=>tocObserver.observe(heading));
     }
   }
   function renderBookmarks() {
@@ -171,7 +162,7 @@
     activeDoc=doc?doc.path:null;
     restoring=true;
     if(doc) {
-      state.last=doc.path;save();renderDocument(doc);
+      state.last=doc.path;save();renderDocument(doc,params);
     } else if(raw==='bookmarks')renderBookmarks();
     else if(requested) {
       document.getElementById('breadcrumb-current').textContent='未找到章节';
@@ -237,7 +228,7 @@
     }
     const matches=searchDocuments(docs,query);
     status.textContent=matches.length?'找到 '+matches.length+' 篇相关内容'+(matches.length>30?' · 显示前 30 篇':''):'没有找到结果，试试更短的关键词或英文缩写';
-    results.innerHTML=matches.slice(0,30).map(result=>'<a class="search-result" href="'+route(result.path)+'"><small>'+esc(groups.get(result.group))+'</small><h3>'+highlight(result.title,query)+'</h3><p>'+highlight(result.excerpt,query)+'</p></a>').join('');
+    results.innerHTML=matches.slice(0,30).map(result=>'<a class="search-result" href="'+route(result.path)+'&view=full"><small>'+esc(groups.get(result.group))+'</small><h3>'+highlight(result.title,query)+'</h3><p>'+highlight(result.excerpt,query)+'</p></a>').join('');
   }
   function openSearch() {
     closeMenu();
@@ -294,6 +285,7 @@
     }
   });
   content.addEventListener('click',async event=>{
+    if(event.target.closest('[data-jump-atlas]'))document.getElementById('knowledge-atlas')?.scrollIntoView({behavior:'auto'});
     if(event.target.closest('[data-search]'))openSearch();
     if(event.target.closest('#bookmark-page'))toggleLocalList('bookmarks');
     if(event.target.closest('#mark-read,[data-mark-read]'))toggleLocalList('read');
@@ -311,7 +303,10 @@
       } catch {toast('当前浏览器不允许自动复制，请选中代码手动复制');}
     }
     const local=event.target.closest('a[href^="#doc="]');
-    if(local) {const parent=local.closest('.mobile-toc');if(parent)parent.open=false;}
+    if(local) {
+      const parent=local.closest('.mobile-toc');if(parent)parent.open=false;
+      if(local.getAttribute('href')===location.hash){event.preventDefault();const target=new URLSearchParams(location.hash.slice(1)).get('section');if(target)document.getElementById(target)?.scrollIntoView({behavior:'auto'});}
+    }
   });
   window.addEventListener('hashchange',renderRoute);
   window.addEventListener('scroll',()=>{clearTimeout(scrollTimer);scrollTimer=setTimeout(rememberPosition,350);},{passive:true});
