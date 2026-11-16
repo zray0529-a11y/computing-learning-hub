@@ -13,6 +13,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
   const reportError = (message) => {
     if (errorReported || disposed) return;
     errorReported = true;
+    console.warn('[KnowledgeAtlas] '+message);
     try { onError(message); } catch { /* The host retains its readable fallback. */ }
   };
 
@@ -661,6 +662,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       },
     };
   } catch (error) {
+    console.error('[KnowledgeAtlas] Scene startup failed:',error);
     cleanup();
     resizeObserver?.disconnect();
     controls?.dispose();

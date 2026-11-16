@@ -94,7 +94,7 @@ export function bindAtlasPage(root,atlas,byPath,params) {
   paintedSelectedId=state.selectedId;
   stage.hidden=state.listView;flat.hidden=!state.listView;
   if(state.listView)flat.innerHTML='<div class="atlas-flat-intro"><b>同一张地图，换一种读法</b><p>点击概念查看解释与关系。场景的当前步骤、历史事件关联的概念会高亮。</p></div><div class="atlas-flat-grid">'+view.visibleIds.map(id=>{const n=nodes.get(id),c=categories.get(n.category);return '<button type="button" class="atlas-flat-node'+(id===state.selectedId?' is-selected':'')+(view.focusIds.includes(id)?' is-focused':'')+'" data-atlas-node="'+id+'" data-focus-key="flat-'+id+'" style="--node-color:'+c.color+'"><span>'+aEsc(c.label)+'</span><strong>'+aEsc(n.label)+'</strong><small>'+aEsc(n.summary)+'</small></button>';}).join('')+'</div>';
-  const fallback=root.querySelector('#atlas-fallback-note');fallback.hidden=!errorMessage;fallback.textContent=errorMessage?'当前浏览器未能启用 3D，已切换为列表。关系说明、协作步骤与历史资料仍可完整阅读。':'';
+  const fallback=root.querySelector('#atlas-fallback-note');fallback.hidden=!errorMessage;fallback.textContent=errorMessage?errorMessage+' 已切换为列表阅读。':'';
   const toggle=root.querySelector('#atlas-view-toggle');toggle.textContent=state.listView?'切换 3D':'列表视图';toggle.setAttribute('aria-pressed',String(state.listView));toggle.disabled=Boolean(errorMessage);
   root.querySelectorAll('[data-atlas-camera]').forEach(b=>b.disabled=state.listView||Boolean(errorMessage));
   root.querySelector('#atlas-interaction-help').textContent=state.listView?'点击卡片或使用上方选择框，查看关系':'拖动旋转 · 滚轮缩放 · 点击模型看关联';
