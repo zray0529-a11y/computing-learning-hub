@@ -73,6 +73,8 @@ test('pinned Three.js and OrbitControls run as a self-contained classic script w
  assert.equal(context.KnowledgeThree.REVISION,'180');
  assert.equal(typeof context.KnowledgeThree.WebGLRenderer,'function');
  assert.equal(typeof context.KnowledgeThree.OrbitControls,'function');
+ assert.equal(typeof context.KnowledgeThree.SVGRenderer,'function');
+ assert.equal(typeof context.KnowledgeThree.Projector,'function');
  assert.equal(new context.KnowledgeThree.Vector3(3,4,0).length(),5);
  assert.doesNotMatch(source,/<\/script/i,'Bundling must not prematurely close the inline script');
 });

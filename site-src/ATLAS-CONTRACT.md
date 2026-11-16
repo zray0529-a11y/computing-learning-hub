@@ -24,4 +24,6 @@ Host is `.atlas-stage`, position:relative, with a definite responsive height. Re
 
 Three.js scene must show actual spatial geometry and directional edges where meaningful; stable positions, render on demand, no automatic spin, DPR≤1.5, resize handling, bounded orbit/pan/zoom, reset view. Distinct concrete geometries for chips, database cylinders, stacks, network hubs, buildings. `onError(message)` is called for missing WebGL2/context loss and UI switches to readable list. Free all geometries/materials/controls/events/observers on dispose and remove only renderer-owned elements. Catch startup error and return a safe no-op controller. Respect reduced motion (no automatic motion at all is fine).
 
+Compatibility extension after observed browser limitation: if WebGL 2 is unavailable, use the official same-version SVGRenderer + Projector with the same scene, camera and OrbitControls, with Lambert materials and lower mesh subdivision. Mark renderer-owned wrapper `data-renderer="svg"` or `"webgl"`. Only both-path failures trigger onError and automatic text/list fallback. Both rendering modules are vendored and embedded offline.
+
 Root owns UI, CSS, build integration, vendor files and tests. Content agents own only assigned data files. Renderer agent owns only atlas-scene.mjs. Do not change other owned files.

@@ -9,7 +9,7 @@
 | 第三方论文、标准、官方文档、商标与外部链接目标 | 保留其原有权利与许可，本项目不为它们重新授权 |
 | 原创网页界面、JavaScript、CSS、HTML 模板、构建脚本与测试 | [MIT License](LICENSE)；生成页面内的教材正文与教学机制图仍采用 CC BY 4.0 |
 | 随源码分发的 marked 17.0.5 | 原项目 MIT 许可，完整声明保留于网站源码的 vendor 目录 |
-| 随源码分发的 Three.js r180 与 OrbitControls | 原项目 MIT 许可，完整声明保留于网站源码的 vendor 目录及离线 HTML 内；知识图谱的原创教学文字采用 CC BY 4.0 |
+| 随源码分发的 Three.js r180、OrbitControls、SVGRenderer 与 Projector | 原项目 MIT 许可，完整声明保留于网站源码的 vendor 目录及离线 HTML 内；知识图谱的原创教学文字采用 CC BY 4.0 |
 
 Copyright (c) 2026 Computing Learning Hub contributors.
 

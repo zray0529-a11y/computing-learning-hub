@@ -1,7 +1,8 @@
 /* Original MIT-licensed miniature knowledge atlas. Three.js is supplied locally. */
 
 /**
- * Creates an on-demand WebGL scene. The surrounding reader owns the equivalent
+ * Creates an on-demand Three.js scene, using SVG when WebGL is unavailable.
+ * The surrounding reader owns the equivalent
  * accessible concept list, relation descriptions, and scenario/history controls.
  */
 export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = () => {} } = {}) {
@@ -21,7 +22,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     const doc = host?.ownerDocument;
     const win = doc?.defaultView;
     const T = win?.KnowledgeThree;
-    if (!doc || !win || !T?.WebGLRenderer || !T?.OrbitControls) {
+    if (!doc || !win || (!T?.WebGLRenderer && !T?.SVGRenderer) || !T?.OrbitControls) {
       reportError('三维运行时未能加载；仍可使用概念列表、关系和分步说明。');
       return emptyController;
     }
@@ -29,21 +30,38 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     wrapper = doc.createElement('div');
     wrapper.className = 'atlas-scene';
     Object.assign(wrapper.style, { position: 'absolute', inset: '0', overflow: 'hidden' });
-    const canvas = doc.createElement('canvas');
-    canvas.setAttribute('aria-hidden', 'true');
-    Object.assign(canvas.style, { display: 'block', width: '100%', height: '100%', touchAction: 'none' });
-    const context = canvas.getContext('webgl2', { alpha: true, antialias: true, powerPreference: 'low-power' });
-    if (!context) {
-      reportError('当前浏览器无法创建 WebGL 2 场景；仍可使用完整的概念列表和分步说明。');
-      return emptyController;
+    const webglCanvas = doc.createElement('canvas');
+    let context = null, usingSvg = false;
+    try {
+      context = webglCanvas.getContext('webgl2', { alpha: true, antialias: true, powerPreference: 'low-power' });
+      if (context && T.WebGLRenderer) renderer = new T.WebGLRenderer({ canvas: webglCanvas, context, alpha: true, antialias: true, powerPreference: 'low-power' });
+    } catch (error) {
+      console.warn('[KnowledgeAtlas] WebGL unavailable; trying SVG projection:', error);
     }
-    renderer = new T.WebGLRenderer({ canvas, context, alpha: true, antialias: true, powerPreference: 'low-power' });
-    renderer.setPixelRatio(Math.min(win.devicePixelRatio || 1, 1.5));
-    renderer.setClearColor(0xf4f7fa, 0);
+    if (!renderer) {
+      if (!T.SVGRenderer) {
+        reportError('当前浏览器无法创建三维绘图场景；仍可使用完整的概念列表和分步说明。');
+        return emptyController;
+      }
+      renderer = new T.SVGRenderer();
+      renderer.setQuality('high');
+      renderer.setPrecision?.(2);
+      renderer.overdraw = 0.35;
+      usingSvg = true;
+    }
+    const surface = renderer.domElement;
+    surface.setAttribute('aria-hidden', 'true');
+    surface.setAttribute('focusable', 'false');
+    Object.assign(surface.style, { display: 'block', width: '100%', height: '100%', touchAction: 'none' });
+    wrapper.dataset.renderer = usingSvg ? 'svg' : 'webgl';
+    renderer.setPixelRatio?.(Math.min(win.devicePixelRatio || 1, 1.5));
+    renderer.setClearColor(usingSvg ? 0xeff4f0 : 0xf4f7fa, 0);
     renderer.outputColorSpace = T.SRGBColorSpace;
-    renderer.toneMapping = T.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
-    wrapper.append(canvas);
+    if (!usingSvg) {
+      renderer.toneMapping = T.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+    }
+    wrapper.append(surface);
     const labelLayer = doc.createElement('div');
     labelLayer.className = 'atlas-label-layer';
     Object.assign(labelLayer.style, { position: 'absolute', inset: '0', overflow: 'hidden', pointerEvents: 'none' });
@@ -51,15 +69,16 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     host.append(wrapper);
 
     const scene = new T.Scene();
-    scene.add(new T.HemisphereLight(0xffffff, 0x8fa6b9, 2.4));
-    const sunlight = new T.DirectionalLight(0xffffff, 2.8);
+    // SVGRenderer supports ambient/directional lighting but not hemisphere light.
+    scene.add(usingSvg ? new T.AmbientLight(0x9aa5b0) : new T.HemisphereLight(0xffffff, 0x8fa6b9, 2.4));
+    const sunlight = new T.DirectionalLight(0xffffff, usingSvg ? 0.72 : 2.8);
     sunlight.position.set(-8, 18, 12);
     scene.add(sunlight);
-    const fill = new T.DirectionalLight(0xcce9ff, 1.2);
+    const fill = new T.DirectionalLight(0xcce9ff, usingSvg ? 0.23 : 1.2);
     fill.position.set(12, 7, -12);
     scene.add(fill);
     const camera = new T.OrthographicCamera(-16, 16, 12, -12, 0.1, 200);
-    controls = new T.OrbitControls(camera, canvas);
+    controls = new T.OrbitControls(camera, surface);
     controls.enableDamping = false;
     controls.enablePan = true;
     controls.screenSpacePanning = false;
@@ -94,7 +113,14 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
 
     const ownGeometry = (geometry) => { geometries.add(geometry); return geometry; };
     const ownMaterial = (material) => { materials.add(material); return material; };
-    const material = (color, options = {}) => ownMaterial(new T.MeshStandardMaterial({ color, roughness: 0.6, metalness: 0.05, ...options }));
+    const material = (color, options = {}) => {
+      if (!usingSvg) return ownMaterial(new T.MeshStandardMaterial({ color, roughness: 0.6, metalness: 0.05, ...options }));
+      const { roughness, metalness, emissiveIntensity, ...supported } = options;
+      const surfaceMaterial = new T.MeshLambertMaterial({ color, ...supported });
+      if (emissiveIntensity != null) surfaceMaterial.emissive.multiplyScalar(emissiveIntensity);
+      return ownMaterial(surfaceMaterial);
+    };
+    const roundSegments = usingSvg ? 10 : 24;
     const tint = (color, amount = 0.82) => new T.Color(color).lerp(new T.Color(0xffffff), amount);
     const box = (x, y, z) => ownGeometry(new T.BoxGeometry(x, y, z));
     const mesh = (parent, geometry, surface, x = 0, y = 0, z = 0) => {
@@ -112,7 +138,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     };
     const polyline = (parent, points, color, opacity = 1, dashed = false) => {
       const lineMaterial = ownMaterial(dashed
-        ? new T.LineDashedMaterial({ color, transparent: true, opacity, dashSize: 0.25, gapSize: 0.17, depthWrite: false })
+        ? new T.LineDashedMaterial({ color, transparent: true, opacity, dashSize: usingSvg ? 3 : 0.25, gapSize: usingSvg ? 3 : 0.17, depthWrite: false })
         : new T.LineBasicMaterial({ color, transparent: true, opacity, depthWrite: false }));
       const line = new T.Line(ownGeometry(new T.BufferGeometry().setFromPoints(points)), lineMaterial);
       if (dashed) line.computeLineDistances();
@@ -130,10 +156,11 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       const group = new T.Group();
       group.userData.nodeId = node.id;
       const shadow = material('#243c52', { transparent: true, opacity: 0.055, depthWrite: false });
-      const shadowMesh = mesh(group, ownGeometry(new T.CircleGeometry(0.91, 24)), shadow, 0.06, 0.015, 0.09);
+      const shadowMesh = mesh(group, ownGeometry(new T.CircleGeometry(0.91, roundSegments)), shadow, 0.06, 0.015, 0.09);
       shadowMesh.rotation.x = -Math.PI / 2;
-      mesh(group, ownGeometry(new T.CylinderGeometry(0.76, 0.82, 0.12, 24)), porcelain, 0, 0.09, 0);
-      mesh(group, ownGeometry(new T.CylinderGeometry(0.77, 0.77, 0.035, 24)), pale, 0, 0.158, 0);
+      if (usingSvg) shadowMesh.renderOrder = -10;
+      mesh(group, ownGeometry(new T.CylinderGeometry(0.76, 0.82, 0.12, roundSegments)), porcelain, 0, 0.09, 0);
+      mesh(group, ownGeometry(new T.CylinderGeometry(0.77, 0.77, 0.035, roundSegments)), pale, 0, 0.158, 0);
       const model = new T.Group();
       model.position.y = 0.16;
       group.add(model);
@@ -151,8 +178,8 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
         }
         case 'database': {
           for (let i = 0; i < 3; i++) {
-            mesh(model, ownGeometry(new T.CylinderGeometry(0.48, 0.48, 0.23, 24)), i === 2 ? primary : pale, 0, 0.18 + i * 0.27, 0);
-            mesh(model, ownGeometry(new T.CylinderGeometry(0.485, 0.485, 0.025, 24)), porcelain, 0, 0.3 + i * 0.27, 0);
+            mesh(model, ownGeometry(new T.CylinderGeometry(0.48, 0.48, 0.23, roundSegments)), i === 2 ? primary : pale, 0, 0.18 + i * 0.27, 0);
+            mesh(model, ownGeometry(new T.CylinderGeometry(0.485, 0.485, 0.025, roundSegments)), porcelain, 0, 0.3 + i * 0.27, 0);
           }
           break;
         }
@@ -237,7 +264,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       }
 
       const ringMaterial = material(color, { emissive: color, emissiveIntensity: 0.18, roughness: 0.9 });
-      const ring = mesh(group, ownGeometry(new T.TorusGeometry(0.89, 0.035, 6, 40)), ringMaterial, 0, 0.14, 0);
+      const ring = mesh(group, ownGeometry(new T.TorusGeometry(0.89, 0.035, usingSvg ? 4 : 6, usingSvg ? 20 : 40)), ringMaterial, 0, 0.14, 0);
       ring.rotation.x = Math.PI / 2;
       ring.visible = false;
       const pointerMaterial = material(color);
@@ -281,9 +308,11 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     }
 
     function platform(centerX, centerZ, sizeX, sizeZ, color) {
-      mesh(scenery, box(sizeX, 0.13, sizeZ), material(tint(color, 0.94), { roughness: 0.95 }), centerX, -0.08, centerZ);
+      const deck = mesh(scenery, box(sizeX, 0.13, sizeZ), material(tint(color, 0.94), { roughness: 0.95 }), centerX, -0.08, centerZ);
       const x = sizeX / 2, z = sizeZ / 2;
-      polyline(scenery, [[-x, -z], [x, -z], [x, z], [-x, z], [-x, -z]].map(([a, b]) => new T.Vector3(centerX + a, 0.005, centerZ + b)), tint(color, 0.5), 0.62);
+      const border = polyline(scenery, [[-x, -z], [x, -z], [x, z], [-x, z], [-x, -z]].map(([a, b]) => new T.Vector3(centerX + a, 0.005, centerZ + b)), tint(color, 0.5), 0.62);
+      // SVG uses a painter's algorithm: large floor polygons must stay behind models.
+      if (usingSvg) { deck.renderOrder = -30; border.renderOrder = -29; }
     }
 
     function graphLayout() {
@@ -390,12 +419,14 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
         const curve = new T.QuadraticBezierCurve3(start, middle, end);
         const color = edge.type === 'foundation' ? '#72869b' : (categoryMap.get(nodeMap.get(edge.from)?.category)?.color || '#527e88');
         const line = polyline(edges, curve.getPoints(24), color, 0.25, edge.type === 'collaboration');
+        if (usingSvg) line.renderOrder = -5;
         let arrow = null;
         if (edge.type !== 'collaboration') {
           const arrowSurface = material(color, { transparent: true, opacity: 0.48, depthWrite: false });
           arrow = mesh(edges, ownGeometry(new T.ConeGeometry(0.11, 0.31, 5)), arrowSurface);
           arrow.position.copy(curve.getPoint(0.9));
           arrow.quaternion.setFromUnitVectors(up, curve.getTangent(0.9).normalize());
+          if (usingSvg) arrow.renderOrder = -5;
         }
         edgeRecords.push({ edge, line, arrow });
       });
@@ -540,7 +571,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       const rectangle = host.getBoundingClientRect();
       width = Math.max(1, Math.round(rectangle.width));
       height = Math.max(1, Math.round(rectangle.height));
-      renderer.setPixelRatio(Math.min(win.devicePixelRatio || 1, 1.5));
+      renderer.setPixelRatio?.(Math.min(win.devicePixelRatio || 1, 1.5));
       renderer.setSize(width, height, false);
       frameCamera(false);
     }
@@ -574,7 +605,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     }
 
     function pick(event) {
-      const rectangle = canvas.getBoundingClientRect();
+      const rectangle = surface.getBoundingClientRect();
       if (!rectangle.width || !rectangle.height) return null;
       pointer.set(((event.clientX - rectangle.left) / rectangle.width) * 2 - 1, -((event.clientY - rectangle.top) / rectangle.height) * 2 + 1);
       raycaster.setFromCamera(pointer, camera);
@@ -591,7 +622,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       if (disposed || failed || event.buttons) return;
       const next = pick(event);
       if (next !== hoveredId) { hoveredId = next; applyState(); requestRender(); }
-      canvas.style.cursor = next ? 'pointer' : 'grab';
+      surface.style.cursor = next ? 'pointer' : 'grab';
     };
     const pointerUp = (event) => {
       if (!pointerStart || pointerStart.id !== event.pointerId) return;
@@ -609,12 +640,12 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       frame = 0;
       reportError('浏览器已释放三维绘图资源；概念列表、关系和场景说明仍可继续使用。');
     };
-    canvas.addEventListener('pointerdown', pointerDown);
-    canvas.addEventListener('pointermove', pointerMove);
-    canvas.addEventListener('pointerup', pointerUp);
-    canvas.addEventListener('pointerleave', pointerLeave);
-    canvas.addEventListener('pointercancel', pointerCancel);
-    canvas.addEventListener('webglcontextlost', contextLost);
+    surface.addEventListener('pointerdown', pointerDown);
+    surface.addEventListener('pointermove', pointerMove);
+    surface.addEventListener('pointerup', pointerUp);
+    surface.addEventListener('pointerleave', pointerLeave);
+    surface.addEventListener('pointercancel', pointerCancel);
+    if (!usingSvg) surface.addEventListener('webglcontextlost', contextLost);
     controls.addEventListener('change', requestRender);
     const onVisibility = () => { if (!doc.hidden) requestRender(); };
     doc.addEventListener('visibilitychange', onVisibility);
@@ -626,12 +657,12 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       resizeObserver?.disconnect();
       win.removeEventListener('resize', resize);
       doc.removeEventListener('visibilitychange', onVisibility);
-      canvas.removeEventListener('pointerdown', pointerDown);
-      canvas.removeEventListener('pointermove', pointerMove);
-      canvas.removeEventListener('pointerup', pointerUp);
-      canvas.removeEventListener('pointerleave', pointerLeave);
-      canvas.removeEventListener('pointercancel', pointerCancel);
-      canvas.removeEventListener('webglcontextlost', contextLost);
+      surface.removeEventListener('pointerdown', pointerDown);
+      surface.removeEventListener('pointermove', pointerMove);
+      surface.removeEventListener('pointerup', pointerUp);
+      surface.removeEventListener('pointerleave', pointerLeave);
+      surface.removeEventListener('pointercancel', pointerCancel);
+      surface.removeEventListener('webglcontextlost', contextLost);
       controls.removeEventListener('change', requestRender);
     };
     resize();
@@ -656,8 +687,8 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
         geometries.forEach((geometry) => geometry.dispose());
         materials.forEach((surface) => surface.dispose());
         geometries.clear(); materials.clear();
-        renderer.dispose();
-        renderer.forceContextLoss();
+        renderer.dispose?.();
+        renderer.forceContextLoss?.();
         wrapper.remove();
       },
     };
@@ -668,8 +699,8 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     controls?.dispose();
     geometries.forEach((geometry) => geometry.dispose());
     materials.forEach((surface) => surface.dispose());
-    renderer?.dispose();
-    renderer?.forceContextLoss();
+    renderer?.dispose?.();
+    renderer?.forceContextLoss?.();
     wrapper?.remove();
     reportError('无法启动三维场景；仍可使用概念列表、关系和分步说明。');
     return emptyController;

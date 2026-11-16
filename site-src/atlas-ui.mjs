@@ -99,7 +99,8 @@ export function bindAtlasPage(root,atlas,byPath,params) {
   root.querySelectorAll('[data-atlas-camera]').forEach(b=>b.disabled=state.listView||Boolean(errorMessage));
   root.querySelector('#atlas-interaction-help').textContent=state.listView?'点击卡片或使用上方选择框，查看关系':'拖动旋转 · 滚轮缩放 · 点击模型看关联';
   root.querySelector('#atlas-scene-title').textContent={graph:'关系图谱',scenario:'协作场景',history:'历史沿革'}[state.mode];
-  root.querySelector('#atlas-scene-meta').textContent=view.visibleIds.length+' 个概念'+(state.mode==='graph'?' · '+view.focusIds.length+' 个正在关联':'');
+  const lightweight=stage.querySelector('.atlas-scene')?.dataset.renderer==='svg';
+  root.querySelector('#atlas-scene-meta').textContent=view.visibleIds.length+' 个概念'+(state.mode==='graph'?' · '+view.focusIds.length+' 个正在关联':'')+(lightweight?' · 轻量 3D':'');
   if(scene&&!state.listView)scene.update(view);
   syncURL();
   const text=state.mode==='scenario'?'步骤 '+(state.step+1)+'：'+getScenario().steps[state.step].title:state.mode==='history'?getEvent().dateLabel+'，'+getEvent().title:(nodes.get(state.selectedId)?.label||'没有匹配的概念')+'，'+view.visibleIds.length+' 个匹配概念';
