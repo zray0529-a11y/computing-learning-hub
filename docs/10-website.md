@@ -52,8 +52,8 @@
 
 本地检查与构建需要 Node.js 22 或更新版本，以及用于原有教材检查的 Python 3：
 
-    node --test tests/*.test.mjs
     node scripts/build-site.mjs
+    node --test --test-concurrency=1 tests/*.test.mjs
     python3 -B scripts/verify.py
 
 生成的网页位于构建输出目录。Markdown 解析器 marked 17.0.5 随源码提供，保留其原始 MIT 许可；浏览器阅读时无需联网加载该解析器。已有三张流程图以 SVG 内嵌，源图变更后须重新生成并更新图源摘要，避免显示过期图表。
