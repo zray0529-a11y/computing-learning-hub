@@ -343,7 +343,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       label.addEventListener('click', () => { if (!disposed && !failed) onSelect(node.id); });
       labelLayer.append(label);
       const nightColors = [new T.Color(color), new T.Color(color).lerp(new T.Color('#14251c'), 0.55), new T.Color(color).lerp(new T.Color('#0e1914'), 0.85), new T.Color(color).multiplyScalar(0.34)];
-      const record = { node, group, label, ring, marker, surfaces: surfaces.map((surface, index) => ({ surface, color: surface.color.clone(), nightColor: nightColors[index] })), anchor: new T.Vector3(), visible: true };
+      const record = { node, group, label, ring, marker, surfaces: surfaces.map((surface, index) => ({ surface, color: surface.color.clone(), nightColor: nightColors[index] ?? surface.color.clone() })), anchor: new T.Vector3(), visible: true };
       records.set(node.id, record);
       scene.add(group);
     }
