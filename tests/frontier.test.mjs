@@ -4,7 +4,7 @@ import {validateFrontier,frontierEntries,frontierSelection,frontierFreshness,ren
 
 const known=new Set(['docs/chapters/12-agents.md']);
 const entry={id:'release',date:'2026-11-13',dateLabel:'公告',vendor:'DeepSeek',status:'released',statusLabel:'已发布',title:'新版工具调用',summary:'发生了什么',mechanism:'如何运作',example:'虚构例子',boundary:'适用边界',sources:[{label:'官方公告',url:'https://api-docs.deepseek.com/zh-cn/news/'}],related:[...known]};
-const feed=()=>({schemaVersion:1,checkedAt:'2026-11-16',updatedAt:'2026-11-16',updatePolicy:{mode:'manual',intervalHours:6},entries:[structuredClone(entry)]});
+const feed=()=>({schemaVersion:1,checkedAt:'2026-11-16',updatedAt:'2026-11-16',updatePolicy:{mode:'manual'},entries:[structuredClone(entry)]});
 
 test('frontier publishing requires dated, sourced claims and real chapter links',()=>{
   assert.doesNotThrow(()=>validateFrontier(feed(),known));

@@ -4,7 +4,7 @@
   "updatedAt": "2026-11-16",
   "updatePolicy": {
     "mode": "scheduled",
-    "intervalHours": 6
+    "scheduleLabel": "每周二、周五 09:00（北京时间）"
   },
   "entries": [
     {
