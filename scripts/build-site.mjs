@@ -8,12 +8,18 @@ import {validateLesson} from '../site-src/visual-core.mjs';
 import {lessons as foundations} from '../site-src/lessons/foundations.mjs';
 import {lessons as systems} from '../site-src/lessons/systems.mjs';
 import {lessons as architecture} from '../site-src/lessons/architecture.mjs';
+import {atlasCategories,atlasNodes,atlasEdges,atlasScenarios} from '../site-src/atlas-data.mjs';
+import {atlasHistory} from '../site-src/atlas-history.mjs';
+import {validateAtlas} from '../site-src/atlas-core.mjs';
+import {bundleThree} from './bundle-three.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 const read=p=>readFileSync(path.join(root,p),'utf8');
 const catalog=JSON.parse(read('site-src/catalog.json'));
 const diagrams=JSON.parse(read('site-src/diagrams.json'));
 const known=new Set(catalog.documents.map(d=>d.path));
+const atlas={categories:atlasCategories,nodes:atlasNodes,edges:atlasEdges,scenarios:atlasScenarios,history:atlasHistory};
+validateAtlas(atlas,known);
 const lessons=[...foundations,...systems,...architecture];
 const visuals=new Map(lessons.map(lesson=>[lesson.path,lesson]));
 const expectedVisuals=catalog.documents.filter(doc=>doc.number&&(doc.group==='chapters'||doc.group==='architecture'));
@@ -83,17 +89,22 @@ for(const doc of documents) for(const match of doc.html.matchAll(/href="(#doc=[^
 const core=read('site-src/core.mjs').replace(/^export /gm,'');
 const visualCore=read('site-src/visual-core.mjs').replace(/^export /gm,'');
 const visualReader=read('site-src/visual-reader.mjs').replace(/^import .*;\n/gm,'').replace(/^export /gm,'');
+const atlasCore=read('site-src/atlas-core.mjs').replace(/^export /gm,'');
+const atlasScene=read('site-src/atlas-scene.mjs').replace(/^import .*;\n/gm,'').replace(/^export /gm,'');
+const atlasUI=read('site-src/atlas-ui.mjs').replace(/^import .*;\n/gm,'').replace(/^export /gm,'');
+const three=bundleThree();
 const app=read('site-src/app.js');
-const css=read('site-src/styles.css')+'\n'+read('site-src/visual.css');
-const version=digest(JSON.stringify(documents)+core+visualCore+visualReader+app+css).slice(0,12);
-const data={version,groups:catalog.groups,documents,repo:'https://github.com/zray0529-a11y/computing-learning-hub'};
+const css=read('site-src/styles.css')+'\n'+read('site-src/visual.css')+'\n'+read('site-src/atlas.css');
+const scripts=[core,visualCore,visualReader,three,atlasCore,atlasScene,atlasUI,app].join('\n');
+const version=digest(JSON.stringify(documents)+JSON.stringify(atlas)+scripts+css).slice(0,12);
+const data={version,groups:catalog.groups,documents,atlas,repo:'https://github.com/zray0529-a11y/computing-learning-hub'};
 const json=JSON.stringify(data).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
 const html=read('site-src/template.html')
   .replace('/* STYLES */',()=>css)
   .replace('<!-- KNOWLEDGE_DATA -->',()=>'<script id="knowledge-data" type="application/json">'+json+'</script>')
-  .replace('/* APP_SCRIPT */',()=>core+'\n'+visualCore+'\n'+visualReader+'\n'+app);
+  .replace('/* APP_SCRIPT */',()=>scripts);
 if(/<script[^>]+src=|<link[^>]+(?:stylesheet|preload)/i.test(html)) throw new Error('External runtime asset defeats offline delivery');
 mkdirSync(path.join(root,'_site'),{recursive:true});
 writeFileSync(path.join(root,'_site/index.html'),html);
 writeFileSync(path.join(root,'_site/.nojekyll'),'');
-console.log(JSON.stringify({documents:documents.length,chapters:14,architectureTopics:4,inlineDiagrams:Object.keys(diagrams).length,visualLessons:lessons.length,bytes:Buffer.byteLength(html),version}));
+console.log(JSON.stringify({documents:documents.length,chapters:14,architectureTopics:4,inlineDiagrams:Object.keys(diagrams).length,visualLessons:lessons.length,atlasConcepts:atlas.nodes.length,atlasConnections:atlas.edges.length,historyEvents:atlas.history.length,threeRevision:'180',bytes:Buffer.byteLength(html),version}));

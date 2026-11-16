@@ -19,6 +19,7 @@
   let scrollTimer=null;
   let toastTimer=null;
   let tocObserver=null;
+  let disposeAtlas=null;
   const content=document.getElementById('content');
   const dialog=document.getElementById('search-dialog');
   const searchInput=document.getElementById('search-input');
@@ -77,8 +78,12 @@
       return '<section class="nav-group"><h2 class="nav-group-heading">'+icon(group.icon)+esc(group.label)+'</h2>'+links+'</section>';
     }).join('');
     const home=document.querySelector('a.home-nav');
-    home.classList.toggle('active',!activeDoc&&location.hash!=='#bookmarks');
-    if(!activeDoc&&location.hash!=='#bookmarks')home.setAttribute('aria-current','page');else home.removeAttribute('aria-current');
+    const isAtlas=new URLSearchParams(location.hash.slice(1)).has('atlas');
+    home.classList.toggle('active',!activeDoc&&location.hash!=='#bookmarks'&&!isAtlas);
+    if(!activeDoc&&location.hash!=='#bookmarks'&&!isAtlas)home.setAttribute('aria-current','page');else home.removeAttribute('aria-current');
+    const atlasLink=document.getElementById('open-atlas');
+    atlasLink.classList.toggle('active',isAtlas);
+    if(isAtlas)atlasLink.setAttribute('aria-current','page');else atlasLink.removeAttribute('aria-current');
     document.getElementById('bookmark-count').textContent=state.bookmarks.length;
     document.getElementById('show-bookmarks').classList.toggle('active',location.hash==='#bookmarks');
   }
@@ -90,6 +95,12 @@
     document.title='计算机学习知识库 · 图解版';
     document.getElementById('breadcrumb-current').textContent='图解学习首页';
     content.innerHTML=renderVisualHome(data,state);
+  }
+  function renderAtlas(params) {
+    document.title='知识图谱 · 协作场景 · 历史沿革';
+    document.getElementById('breadcrumb-current').textContent='3D 知识地图';
+    content.innerHTML=renderAtlasPage(data.atlas);
+    disposeAtlas=bindAtlasPage(document.getElementById('atlas-explorer'),data.atlas,byPath,params);
   }
   function tocMarkup(doc) {
     return doc.headings.filter(h=>h.depth===2||h.depth===3).map(h=>'<a class="toc-link depth-'+h.depth+'" href="'+route(doc.path,h.id)+'" data-heading="'+esc(h.id)+'">'+esc(h.text)+'</a>').join('');
@@ -153,6 +164,8 @@
   function renderRoute() {
     clearTimeout(scrollTimer);
     rememberPosition();
+    if(disposeAtlas){disposeAtlas();disposeAtlas=null;}
+    if(tocObserver){tocObserver.disconnect();tocObserver=null;}
     closeMenu();
     if(dialog.open)dialog.close();
     const raw=location.hash.slice(1);
@@ -163,7 +176,8 @@
     restoring=true;
     if(doc) {
       state.last=doc.path;save();renderDocument(doc,params);
-    } else if(raw==='bookmarks')renderBookmarks();
+    } else if(params.has('atlas'))renderAtlas(params);
+    else if(raw==='bookmarks')renderBookmarks();
     else if(requested) {
       document.getElementById('breadcrumb-current').textContent='未找到章节';
       content.innerHTML='<div class="home-wrap"><div class="empty-state"><h2>没有找到这个章节</h2><p>链接可能已发生变化，可以从目录重新进入。</p><a class="primary-button" href="#home">回到首页</a></div></div>';
