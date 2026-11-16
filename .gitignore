@@ -17,3 +17,7 @@ Thumbs.db
 # Temporary outputs
 outputs/
 tmp/
+
+# Generated website and local execution notes
+_site/
+.superpowers/

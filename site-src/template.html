@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#155b46">
+<meta name="description" content="从 0 与 1 到 Agent：14 章计算机基础、4 个建筑与空间专题、可运行实验与高效学习方法。支持全文搜索和离线阅读。">
+<title>计算机学习知识库 · 从理解到实践</title>
+<style>/* STYLES */</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到正文</a>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" aria-label="课程导航">
+    <a class="brand" href="#home" aria-label="计算机学习知识库首页">
+      <span class="brand-icon" aria-hidden="true">c<span>_</span></span>
+      <span class="brand-copy"><strong>计算机学习知识库</strong><small>COMPUTING LEARNING HUB</small></span>
+    </a>
+    <button class="sidebar-close icon-button" id="close-menu" type="button" aria-label="关闭目录">×</button>
+    <div class="sidebar-scroll">
+      <a class="home-nav" href="#home"><span data-icon="home"></span><span>学习首页</span><span class="nav-shortcut">⌂</span></a>
+      <button class="home-nav" id="show-bookmarks" type="button"><span data-icon="bookmark"></span><span>我的收藏</span><span class="nav-shortcut" id="bookmark-count">0</span></button>
+      <nav id="course-nav" aria-label="教材目录"></nav>
+    </div>
+    <div class="sidebar-footer"><span class="status-dot"></span><span>开放知识，自由学习</span><a href="https://github.com/zray0529-a11y/computing-learning-hub" target="_blank" rel="noopener noreferrer" aria-label="在 GitHub 查看仓库"><span data-icon="github"></span></a></div>
+  </aside>
+  <button id="menu-shade" class="menu-shade" aria-label="关闭课程目录" type="button" hidden></button>
+  <div class="workspace">
+    <header class="topbar">
+      <div class="topbar-left"><button id="open-menu" class="icon-button mobile-menu" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="打开课程目录"><span data-icon="menu"></span></button><div class="breadcrumbs"><a href="#home">知识库</a><span>/</span><span id="breadcrumb-current">学习首页</span></div></div>
+      <div class="topbar-actions">
+        <button class="search-trigger" id="open-search" type="button"><span data-icon="search"></span><span>搜索知识、概念…</span><kbd>/</kbd></button>
+        <button class="icon-button" id="theme-toggle" type="button" aria-label="切换为深色主题" title="切换主题"><span data-icon="moon"></span></button>
+        <button class="download-button" id="offline-download" type="button"><span data-icon="download"></span><span>离线下载</span></button>
+      </div>
+    </header>
+    <main id="main" tabindex="-1"><div id="content"><div class="loading-state"><span class="brand-icon">c_</span><h1>计算机学习知识库</h1><p>正在准备教材…</p></div></div></main>
+    <footer class="page-footer"><span>Computing Learning Hub</span><span>文档 CC BY 4.0 · 代码 MIT</span><a href="#doc=NOTICE.md">许可与来源</a></footer>
+  </div>
+</div>
+<dialog id="search-dialog" class="search-dialog" aria-label="搜索知识库">
+  <div class="search-input-row"><span data-icon="search"></span><input id="search-input" type="search" placeholder="搜索章节、概念或代码，例如：事务、RAG、坐标" aria-label="搜索全部教材" autocomplete="off"><button class="icon-button" id="close-search" type="button" aria-label="关闭搜索">×</button></div>
+  <div class="search-meta"><span id="search-status" role="status">输入关键词，搜索全部教材正文</span><span>Esc 关闭</span></div>
+  <div id="search-results" class="search-results"></div>
+  <div class="search-footer"><span class="status-dot"></span>在本机搜索 · 离线也能用</div>
+</dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<noscript><style>.loading-state{display:none}</style><div class="noscript">此阅读器需要浏览器启用 JavaScript。也可以直接打开<a href="https://github.com/zray0529-a11y/computing-learning-hub">公开教材仓库</a>阅读 Markdown。</div></noscript>
+<!-- KNOWLEDGE_DATA -->
+<script>/* APP_SCRIPT */</script>
+</body>
+</html>

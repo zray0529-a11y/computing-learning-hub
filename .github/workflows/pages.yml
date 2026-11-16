@@ -1,0 +1,54 @@
+name: Build and publish learning website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'architecture/**'
+      - 'templates/**'
+      - 'site-src/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - '*.md'
+      - 'LICENSE*'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify the public curriculum
+        run: python3 -B scripts/verify.py
+      - name: Test and build the offline reader
+        run: node --test tests/site.test.mjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@v5
+
