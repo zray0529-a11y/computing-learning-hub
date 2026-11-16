@@ -1,0 +1,99 @@
+.frontier-page{max-width:1120px;padding-bottom:48px}
+.frontier-heading{max-width:800px;margin-bottom:25px}
+.frontier-heading h1{font-size:clamp(27px,3.6vw,43px);line-height:1.3;margin:13px 0}
+.frontier-heading h1 em{font-style:normal;color:var(--accent)}
+.frontier-heading>p{color:var(--muted);line-height:1.7}
+.frontier-freshness{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:20px;color:var(--accent);font-size:13px}
+.frontier-freshness.is-stale{color:var(--amber)}
+.frontier-policy{font-size:12px!important;max-width:720px;margin:9px 0 0}
+.frontier-tabs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:20px}
+.frontier-tabs button,.frontier-loop button,.frontier-index button{font:inherit;color:var(--muted);cursor:pointer;border:1px solid var(--border);background:var(--surface);border-radius:10px}
+.frontier-tabs button{min-height:44px;padding:10px 17px;font-weight:600}
+.frontier-tabs button[aria-pressed=true]{color:var(--accent);background:var(--accent-soft);border-color:var(--border-strong)}
+.frontier-tabs>a{font-size:13px;color:var(--muted);margin-left:auto;padding:10px 0}
+.frontier-panel[hidden]{display:none!important}
+.frontier-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;scroll-margin-top:80px;margin-bottom:14px;font-size:13px;color:var(--muted)}
+.frontier-toolbar label{display:flex;align-items:center;gap:12px}
+.frontier-toolbar select{min-height:44px;font:inherit;color:var(--text);border:1px solid var(--border);border-radius:9px;background:var(--surface);padding:8px 35px 8px 12px;max-width:180px}
+.frontier-card{padding:28px 32px;background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-lg),inset 0 1px 0 var(--rim)}
+.frontier-card-meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.frontier-card-meta>span:first-child{color:var(--accent);font-weight:650}
+.frontier-status{padding:4px 9px;border:1px solid var(--border);background:var(--bg-subtle);border-radius:6px}
+.frontier-status.status-research,.frontier-status.status-experimental{color:var(--amber)}
+.frontier-status.status-preview{color:var(--blue)}
+.frontier-card h2{font-size:25px;line-height:1.45;letter-spacing:-.025em;margin:18px 0 12px;color:var(--text)}
+.frontier-summary{font-size:16px;line-height:1.85;color:var(--text);max-width:850px}
+.frontier-example{padding:15px 18px;border-radius:10px;border-left:3px solid var(--accent);background:var(--accent-soft);margin:18px 0}
+.frontier-example>span{font-size:11px;color:var(--accent);font-weight:650;letter-spacing:.03em}
+.frontier-example p{font-size:14px;line-height:1.8;margin:7px 0 0;color:var(--text)}
+.frontier-boundary{color:var(--muted);font-size:13px;line-height:1.8;margin:16px 0}
+.frontier-boundary strong{display:block;color:var(--text);font-size:12px;margin-bottom:5px}
+.frontier-evidence{border-top:1px solid var(--border);padding-top:13px;color:var(--muted);font-size:13px;line-height:1.8}
+.frontier-evidence summary{cursor:pointer;min-height:34px;color:var(--accent);padding:5px 0}
+.frontier-evidence a{color:var(--accent);overflow-wrap:anywhere;text-decoration:underline;text-underline-offset:3px}
+.frontier-evidence ul{padding-left:20px;margin:12px 0}
+.frontier-related{display:flex;gap:10px 18px;flex-wrap:wrap;padding-top:12px}
+.frontier-related>span{width:100%;font-size:11px}
+.frontier-pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0}
+.frontier-pagination button{min-height:46px}
+.frontier-pagination>a{font-size:12px;color:var(--muted)}
+.frontier-pagination button:disabled{opacity:.4;cursor:default;box-shadow:none}
+.frontier-index{margin-top:12px;border-top:1px solid var(--border);padding-top:16px;color:var(--muted);font-size:13px}
+.frontier-index summary{cursor:pointer;padding:10px 0;min-height:44px}
+.frontier-index>div{display:grid;gap:8px;margin-top:12px}
+.frontier-index button{display:grid;grid-template-columns:150px 1fr auto;gap:12px;text-align:left;align-items:center;padding:14px;min-height:48px}
+.frontier-index strong{color:var(--text);font-weight:550}
+.frontier-loop{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.frontier-loop button{position:relative;text-align:left;padding:17px 13px;min-height:116px}
+.frontier-loop button:not(:last-child)::after{content:'→';position:absolute;right:-10px;top:44%;color:var(--accent);z-index:1}
+.frontier-loop span{display:block;color:var(--accent);font-size:12px;margin-bottom:12px}
+.frontier-loop strong{display:block;font-size:14px;color:var(--text);margin-bottom:6px}
+.frontier-loop small{font-size:11px;line-height:1.6}
+.frontier-loop button[aria-pressed=true]{background:var(--accent-soft);border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
+.frontier-mechanism-card{padding:24px 28px;border:1px solid var(--border);background:var(--surface);border-radius:16px;box-shadow:var(--shadow-sm)}
+.frontier-mechanism-card h2{font-size:25px;margin:16px 0}
+.frontier-mechanism-card>p,.frontier-loop-note{color:var(--muted);font-size:14px;line-height:1.85}
+.frontier-loop-note{font-size:12px;margin:18px 0}
+.frontier-home-entry{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:24px 0;padding:22px 24px;border:1px solid var(--border-strong);border-radius:14px;background:linear-gradient(110deg,var(--accent-soft),var(--surface));color:var(--text);box-shadow:var(--shadow-sm)}
+.frontier-home-entry strong{display:block;font-size:19px;margin:7px 0}
+.frontier-home-entry small{color:var(--muted);font-size:12px}
+.frontier-home-entry>b{color:var(--accent);font-size:22px}
+@media(max-width:720px){
+  .frontier-page{padding-bottom:max(30px,env(safe-area-inset-bottom))}
+  .frontier-heading{margin-bottom:16px}
+  .frontier-heading h1{font-size:27px;margin:9px 0}
+  .frontier-heading>p{font-size:13px;margin:8px 0}
+  .frontier-freshness{gap:10px;justify-content:space-between;margin-top:12px;font-size:11px}
+  .frontier-freshness button{font-size:11px;min-height:44px}
+  .frontier-policy{font-size:10px!important;line-height:1.7!important}
+  .frontier-tabs{gap:6px;margin-bottom:15px;padding-bottom:10px}
+  .frontier-tabs button{padding:10px 12px;font-size:13px}
+  .frontier-tabs>a{font-size:11px;margin-left:0}
+  .frontier-toolbar{font-size:12px;scroll-margin-top:64px}
+  .frontier-toolbar label{gap:8px}
+  .frontier-toolbar select{max-width:145px}
+  .frontier-card{padding:18px 17px;border-radius:14px}
+  .frontier-card-meta{font-size:10px;gap:8px}
+  .frontier-card h2{font-size:21px;margin:13px 0 10px}
+  .frontier-summary{font-size:14px;line-height:1.8;margin:10px 0}
+  .frontier-example{padding:11px 12px;margin:13px 0}
+  .frontier-example p{font-size:13px;line-height:1.7}
+  .frontier-boundary{font-size:12px;line-height:1.75;margin:12px 0}
+  .frontier-evidence{font-size:12px;padding-top:8px}
+  .frontier-evidence summary{min-height:44px}
+  .frontier-pagination{position:sticky;bottom:0;z-index:4;background:var(--bg-elevated);backdrop-filter:blur(14px);border-top:1px solid var(--border);margin:10px -4px 0;padding:10px 4px max(10px,env(safe-area-inset-bottom));gap:8px}
+  .frontier-pagination button{padding:11px 18px;flex:1;font-size:13px}
+  .frontier-pagination>a{font-size:11px;padding:8px 2px}
+  .frontier-index button{grid-template-columns:1fr auto;gap:6px 10px;padding:13px}
+  .frontier-index button>span{grid-column:1/-1;font-size:10px}
+  .frontier-index strong{font-size:13px;line-height:1.6}
+  .frontier-index small{font-size:10px}
+  .frontier-loop{display:flex;overflow-x:auto;gap:8px;scroll-snap-type:x proximity;margin-bottom:14px;padding-bottom:5px}
+  .frontier-loop button{min-width:132px;min-height:110px;scroll-snap-align:start}
+  .frontier-loop button:not(:last-child)::after{display:none}
+  .frontier-mechanism-card{padding:20px 17px}
+  .frontier-mechanism-card h2{font-size:23px}
+  .frontier-home-entry{padding:18px;margin:20px 0;gap:12px}
+  .frontier-home-entry strong{font-size:18px}
+}
+@media print{.frontier-pagination,.frontier-tabs,.frontier-toolbar,.frontier-freshness button{display:none}.frontier-card,.frontier-mechanism-card{box-shadow:none;break-inside:avoid}.frontier-loop button{background:white;color:black}}

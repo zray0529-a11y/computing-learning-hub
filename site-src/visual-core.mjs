@@ -43,6 +43,26 @@ export function resolveReadingMode(params,hasLesson,savedView) {
   return 'visual';
 }
 
+// A mobile card has one teaching purpose. Diagram steps share the same SVG,
+// while the remaining cards keep the existing interactive panels intact.
+export function visualReadingCards(lesson) {
+  return [
+    {key:'overview',section:'visual-explainer',step:-1,label:'先看全貌'},
+    ...lesson.steps.map((step,index)=>({key:'step-'+index,section:'visual-explainer',step:index,label:step.title})),
+    ...(lesson.lab?[{key:'practice',section:'visual-lab',label:'亲手试一下'}]:[]),
+    ...(lesson.analogy?[{key:'analogy',section:'visual-analogy',label:'换个熟悉的角度'}]:[]),
+    {key:'boundary',section:'visual-boundary',label:'辨清一个误区'},
+    {key:'check',section:'visual-check',label:'预测与自测'},
+    {key:'next',section:'visual-next',label:'连接下一个知识点'}
+  ];
+}
+
+export function visualCardIndex(cards,section,savedCard) {
+  // Explicit section links take precedence over a resumed card. Unknown saved
+  // keys safely return to the overview if a lesson's sequence ever changes.
+  return Math.max(0,cards.findIndex(card=>section?card.section===section:card.key===savedCard));
+}
+
 export function validateLesson(lesson,known) {
   const fail=message=>{throw new Error((lesson?.path||'lesson')+': '+message);};
   if(!lesson||!known.has(lesson.path))fail('Unknown public lesson');

@@ -3,6 +3,7 @@
     {"id":"start","label":"从这里开始","icon":"compass"},
     {"id":"chapters","label":"计算机基础 · 14 章","icon":"book"},
     {"id":"architecture","label":"建筑与空间 · 4 专题","icon":"layers"},
+    {"id":"frontier","label":"前沿知识补充","icon":"spark"},
     {"id":"practice","label":"学习方法与实践","icon":"flask"},
     {"id":"reference","label":"查询与资料","icon":"library"},
     {"id":"about","label":"关于与维护","icon":"info"}
@@ -30,6 +31,7 @@
     {"path":"architecture/02-parametric-design.md","title":"参数化与生成式建模","group":"architecture","number":"02","description":"将几何规则、参数和约束变成可重复的过程。"},
     {"path":"architecture/03-gis-and-context.md","title":"GIS 与场地分析","group":"architecture","number":"03","description":"从坐标和单位入手，让空间查询更准确。"},
     {"path":"architecture/04-digital-twins.md","title":"数字孪生与建筑运维","group":"architecture","number":"04","description":"连接模型、设备、观察和时间，追溯真实状态。"},
+    {"path":"docs/15-agent-frontier.md","title":"Agent 前沿：能力与机制","group":"frontier","description":"长任务、多智能体、工具、记忆与 Skills；从官方进展理解机制和边界。"},
     {"path":"docs/03-learning-method.md","title":"怎样真正学会","group":"practice"},
     {"path":"docs/practice/01-labs.md","title":"六个动手实验","group":"practice"},
     {"path":"docs/practice/02-capstone.md","title":"贯穿项目","group":"practice"},

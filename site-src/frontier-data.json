@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-16",
+  "updatedAt": "2026-11-16",
+  "updatePolicy": {
+    "mode": "scheduled",
+    "intervalHours": 6
+  },
+  "entries": [
+    {
+      "id": "deepseek-harness-preview",
+      "date": "2026-11-16",
+      "dateLabel": "核验",
+      "vendor": "DeepSeek",
+      "status": "preview",
+      "statusLabel": "公开预览",
+      "title": "DeepSeek Harness：可组合的智能体运行框架",
+      "summary": "官方提供开源运行框架，可通过桌面端或本地网页使用。当前仍处预览阶段，这里的日期表示核验时间。",
+      "mechanism": "以插件组合工具、技能与界面，让模型调用能够接入文件、代码和任务执行；模型能力与运行框架各有职责。",
+      "example": "在虚构练习目录中，让助手读取课程表、生成汇总，再检查输出文件，观察每一步用了什么工具。",
+      "boundary": "官方提示接口可能出现不兼容变化。安装框架不等于所有模型和插件都已配置，例子也不代表本站已接入服务。",
+      "sources": [
+        {
+          "label": "Harness 官方产品页",
+          "url": "https://www.deepseek.com/harness/"
+        },
+        {
+          "label": "官方仓库与预览说明",
+          "url": "https://github.com/deepseek-ai/deepseek-harness"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/05-operating-systems.md"
+      ]
+    },
+    {
+      "id": "deepseek-application-apis",
+      "date": "2026-11-13",
+      "dateLabel": "公告",
+      "vendor": "DeepSeek",
+      "status": "released",
+      "statusLabel": "已开放 API",
+      "title": "DeepSeek 开放搜索、文件与语音应用 API",
+      "summary": "开发者可调用深度思考搜索、文件输入和链接阅读等能力，并组合独立的文字识别、语音识别与语音合成接口。",
+      "mechanism": "为 deepseek-flash 开启对应参数后，服务端处理相关工具调用与上下文拼接；搜索结果可进入后续推理过程。",
+      "example": "读取一份虚构的公开课程 PDF，再查询最新资料，为三个知识点补充出处，并核对引用是否支持结论。",
+      "boundary": "模型与扩展工具分别计费；搜索能提供材料，仍需检查出处和日期。本卡介绍公开能力，本站没有调用这些 API。",
+      "sources": [
+        {
+          "label": "2026-11-13 官方发布说明",
+          "url": "https://api-docs.deepseek.com/zh-cn/news/news261113/"
+        }
+      ],
+      "related": [
+        "docs/chapters/11-llm-and-rag.md",
+        "docs/chapters/03-programming.md"
+      ]
+    },
+    {
+      "id": "anthropic-self-hosted-managed-agents",
+      "date": "2026-11-12",
+      "dateLabel": "公告",
+      "vendor": "Anthropic",
+      "status": "preview",
+      "statusLabel": "私有测试",
+      "title": "Claude Managed Agents 增加自托管方式",
+      "summary": "自托管版本进入私有测试，组织可在自己的云或机房运行智能体服务，保存凭据与会话历史，并选择模型请求去向。",
+      "mechanism": "运行框架与执行代码的沙箱分开，会话历史保存在自有数据库；受支持调用的凭据可由沙箱外代理加入。",
+      "example": "为虚构学习网站安排夜间检查，让运行服务保存进度；某个执行环境退出后，仍可查阅任务记录。",
+      "boundary": "这次公告针对自托管私有测试，需要申请准入。部署者仍要维护服务、网络规则与运行状态，不能把它写成普遍开放。",
+      "sources": [
+        {
+          "label": "2026-11-12 官方自托管公告",
+          "url": "https://claude.com/ja/resources/articles/self-hosted-claude-managed-agents"
+        }
+      ],
+      "related": [
+        "docs/chapters/09-distributed-systems.md",
+        "docs/chapters/13-security-and-reliability.md"
+      ]
+    },
+    {
+      "id": "anthropic-fable-mythos-5-2",
+      "date": "2026-11-09",
+      "dateLabel": "公告",
+      "vendor": "Anthropic",
+      "status": "released",
+      "statusLabel": "已发布 · 准入不同",
+      "title": "Fable 5.2 与 Mythos 5.2：模型能力与协作分工",
+      "summary": "官方发布两个采用相同底层模型的版本。Fable 面向一般用户；Mythos 需通过特定领域的验证计划申请访问。",
+      "mechanism": "Fable 可担任顾问，帮助其他模型处理难题；也可担任协调者，把较简单任务委派出去，再汇总结果。",
+      "example": "把学习网页修复分为问题排查和结果校验，让协调者整理证据；只有相互独立的子任务才安排并行。",
+      "boundary": "长任务与多智能体展示有特定实验条件，不能保证每次成功。Mythos 的验证准入也不等于公开注册后即可使用。",
+      "sources": [
+        {
+          "label": "2026-11-09 官方模型公告",
+          "url": "https://www.anthropic.com/claude-fable-and-mythos-5-2"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/08-software-engineering.md"
+      ]
+    },
+    {
+      "id": "deepseek-superagent-prototype",
+      "date": "2026-10-31",
+      "dateLabel": "首次提交",
+      "vendor": "DeepSeek",
+      "status": "research",
+      "statusLabel": "研究原型",
+      "title": "DeepSeek SuperAgent：从消息到独立执行任务",
+      "summary": "官方组织公开了面向单个 GitHub 仓库的研究原型，可选接入飞书。README 明确说明它不是正式 DeepSeek 产品。",
+      "mechanism": "消息先经过规则判断，再形成获准任务；每项任务使用独立会话和目录，执行者把结果送回原对话，例如提交修改请求。",
+      "example": "虚构课程网页出现错字，获准的请求形成任务，执行者修改页面、检查结果，再把变更交给读者审阅。",
+      "boundary": "部分设计文章思路尚未实现。运行会话使用操作者的系统权限，独立目录不等于安全沙箱；原型需要自行部署与审查。",
+      "sources": [
+        {
+          "label": "官方原型与状态说明",
+          "url": "https://github.com/deepseek-ai/dsh-superagent-prototype"
+        },
+        {
+          "label": "首次提交记录",
+          "url": "https://github.com/deepseek-ai/dsh-superagent-prototype/commits"
+        },
+        {
+          "label": "官方执行机制",
+          "url": "https://github.com/deepseek-ai/dsh-superagent-prototype/blob/main/docs/003-execution.md"
+        },
+        {
+          "label": "官方部署与权限说明",
+          "url": "https://github.com/deepseek-ai/dsh-superagent-prototype/blob/main/docs/006-deployment.md"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/07-databases.md"
+      ]
+    },
+    {
+      "id": "anthropic-agent-skills-aaif",
+      "date": "2026-10-22",
+      "dateLabel": "公告",
+      "vendor": "Anthropic",
+      "status": "standard",
+      "statusLabel": "开放标准",
+      "title": "Agent Skills 标准转入 Agentic AI Foundation",
+      "summary": "Anthropic 宣布将 Agent Skills 标准相关资产捐赠给 Agentic AI Foundation，为跨工具复用技能提供共同维护基础。",
+      "mechanism": "一个技能用文件夹组织 SKILL.md、脚本与参考资料，把特定任务的操作知识交给支持该标准的智能体读取。",
+      "example": "为虚构学习网页编写一份检查说明，列清手机排版、链接和答案核对步骤，让不同助手按同一规则工作。",
+      "boundary": "技能文件提供工作方法，不会自动完成模型训练，也不赋予工具权限。跨平台复用仍取决于运行环境与依赖。",
+      "sources": [
+        {
+          "label": "2026-10-22 官方捐赠公告",
+          "url": "https://www.anthropic.com/news/donating-agent-skills-to-the-agentic-ai-foundation"
+        }
+      ],
+      "related": [
+        "docs/chapters/08-software-engineering.md",
+        "docs/chapters/12-agents.md"
+      ]
+    },
+    {
+      "id": "anthropic-cowork-cloud",
+      "date": "2026-10-06",
+      "dateLabel": "生效",
+      "vendor": "Anthropic",
+      "status": "released",
+      "statusLabel": "已开放 · 依套餐",
+      "title": "Cowork 云端任务与跨设备继续工作",
+      "summary": "官方帮助文档记录：从 10 月 6 日起，Pro、Max、Ultra 的新 Cowork 任务运行在云端，会话与文件可跨设备继续使用。",
+      "mechanism": "任务执行移到服务端后，关闭笔记本也可继续云端工作；会话记录跟随账户，读者能从另一设备查看进度。",
+      "example": "将虚构的公开课程材料交给任务整理，随后用手机检查生成的目录；把文件所在位置与任务运行位置分开理解。",
+      "boundary": "访问已连接的本地文件仍要求桌面应用打开；不同套餐与管理员设置影响可用范围，已有本地任务也有不同处理方式。",
+      "sources": [
+        {
+          "label": "官方跨设备使用与 10 月 6 日变更说明",
+          "url": "https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile"
+        }
+      ],
+      "related": [
+        "docs/chapters/06-networks.md",
+        "docs/chapters/09-distributed-systems.md"
+      ]
+    }
+  ]
+}

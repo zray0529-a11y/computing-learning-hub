@@ -11,6 +11,7 @@ import {lessons as architecture} from '../site-src/lessons/architecture.mjs';
 import {atlasCategories,atlasNodes,atlasEdges,atlasScenarios} from '../site-src/atlas-data.mjs';
 import {atlasHistory} from '../site-src/atlas-history.mjs';
 import {validateAtlas} from '../site-src/atlas-core.mjs';
+import {validateFrontier} from '../site-src/frontier.mjs';
 import {bundleThree} from './bundle-three.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
@@ -18,6 +19,8 @@ const read=p=>readFileSync(path.join(root,p),'utf8');
 const catalog=JSON.parse(read('site-src/catalog.json'));
 const diagrams=JSON.parse(read('site-src/diagrams.json'));
 const known=new Set(catalog.documents.map(d=>d.path));
+const frontier=JSON.parse(read('site-src/frontier-data.json'));
+validateFrontier(frontier,known);
 const atlas={categories:atlasCategories,nodes:atlasNodes,edges:atlasEdges,scenarios:atlasScenarios,history:atlasHistory};
 validateAtlas(atlas,known);
 const lessons=[...foundations,...systems,...architecture];
@@ -94,11 +97,12 @@ const atlasScene=read('site-src/atlas-scene.mjs').replace(/^import .*;\n/gm,'').
 const atlasUI=read('site-src/atlas-ui.mjs').replace(/^import .*;\n/gm,'').replace(/^export /gm,'');
 const three=bundleThree();
 const motion=read('site-src/motion-upgrade.mjs').replace(/^export /gm,'');
+const frontierReader=read('site-src/frontier.mjs').replace(/^import .*;\n/gm,'').replace(/^export /gm,'');
 const app=read('site-src/app.js');
-const css=read('site-src/styles.css')+'\n'+read('site-src/visual.css')+'\n'+read('site-src/atlas.css')+'\n'+read('site-src/motion-upgrade.css');
-const scripts=[core,visualCore,visualReader,three,atlasCore,atlasScene,atlasUI,motion,app].join('\n');
-const version=digest(JSON.stringify(documents)+JSON.stringify(atlas)+scripts+css).slice(0,12);
-const data={version,groups:catalog.groups,documents,atlas,repo:'https://github.com/zray0529-a11y/computing-learning-hub'};
+const css=read('site-src/styles.css')+'\n'+read('site-src/visual.css')+'\n'+read('site-src/atlas.css')+'\n'+read('site-src/motion-upgrade.css')+'\n'+read('site-src/frontier.css');
+const scripts=[core,visualCore,visualReader,three,atlasCore,atlasScene,atlasUI,motion,frontierReader,app].join('\n');
+const version=digest(JSON.stringify(documents)+JSON.stringify(atlas)+JSON.stringify(frontier)+scripts+css).slice(0,12);
+const data={version,groups:catalog.groups,documents,atlas,frontier,repo:'https://github.com/zray0529-a11y/computing-learning-hub'};
 const json=JSON.stringify(data).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
 const html=read('site-src/template.html')
   .replace('/* STYLES */',()=>css)

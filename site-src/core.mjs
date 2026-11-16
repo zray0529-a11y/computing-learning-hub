@@ -47,7 +47,7 @@ export function searchDocuments(documents, query) {
 }
 
 export function restoreProgress(raw, knownPaths) {
-  const fresh = {read:[],bookmarks:[],last:null,positions:{},views:{},theme:'dark'};
+  const fresh = {read:[],bookmarks:[],last:null,positions:{},views:{},cards:{},theme:'dark'};
   let parsed;
   try { parsed=JSON.parse(raw); } catch { return fresh; }
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return fresh;
@@ -63,6 +63,9 @@ export function restoreProgress(raw, knownPaths) {
   }
   if(parsed.views&&typeof parsed.views==='object'&&!Array.isArray(parsed.views)) {
     for(const [path,view] of Object.entries(parsed.views))if(knownPaths.has(path)&&['visual','full'].includes(view))fresh.views[path]=view;
+  }
+  if(parsed.cards&&typeof parsed.cards==='object'&&!Array.isArray(parsed.cards)) {
+    for(const [path,card] of Object.entries(parsed.cards))if(knownPaths.has(path)&&typeof card==='string'&&/^(?:overview|step-\d{1,2}|practice|analogy|boundary|check|next)$/.test(card))fresh.cards[path]=card;
   }
   return fresh;
 }

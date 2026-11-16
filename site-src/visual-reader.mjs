@@ -1,5 +1,5 @@
 import {escapeHtml} from './core.mjs';
-import {bitValue,transactionState,retrievalExample} from './visual-core.mjs';
+import {bitValue,transactionState,retrievalExample,visualReadingCards,visualCardIndex} from './visual-core.mjs';
 
 const vEsc=escapeHtml;
 const visualRoute=path=>'#doc='+encodeURIComponent(path);
@@ -10,30 +10,66 @@ export function scopedDiagram(svg,prefix) {
 }
 
 function visualLab(kind) {
-  if(kind==='bits')return '<section class="mini-lab" id="visual-lab"><div class="visual-section-label">动手试一下 · 二进制</div><h2>拨动开关，数字会怎样变？</h2><p>亮起的位置计入总数；熄灭的位置贡献 0。</p><div class="bit-switches">'+[8,4,2,1].map((weight,index)=>'<button type="button" data-bit="'+index+'" aria-pressed="'+Boolean([0,1,0,1][index])+'" aria-label="位权 '+weight+'，当前 '+[0,1,0,1][index]+'"><span class="bit-weight">位权 '+weight+'</span><strong>'+[0,1,0,1][index]+'</strong><span class="bit-state">'+([0,1,0,1][index]?'计入':'不计入')+'</span></button>').join('')+'</div><div class="bit-equation" aria-live="polite"><span id="bit-equation">0 × 8 + 1 × 4 + 0 × 2 + 1 × 1</span><span>=</span><strong id="bit-value">5</strong></div><p class="lab-boundary">这里演示 4 位无符号整数，范围 0–15；文字、小数和负数需要另外约定编码。</p></section>';
-  if(kind==='transaction')return '<section class="mini-lab" id="visual-lab"><div class="visual-section-label">动手试一下 · 事务</div><h2>第二步失败，第一步还算数吗？</h2><p>同一个事务新增两行，看看提交和回滚的区别。</p><div class="lab-options" role="group" aria-label="选择事务情境"><button type="button" data-transaction="failure" aria-pressed="true">制造主键冲突</button><button type="button" data-transaction="success" aria-pressed="false">两次写入都成功</button></div><div id="transaction-board"></div><div class="transaction-status" id="transaction-status" role="status" aria-live="polite"><strong></strong><span></span></div><div class="lab-controls"><button type="button" class="secondary-button" data-transaction-reset>重置</button><span id="transaction-progress"></span><button type="button" class="primary-button" data-transaction-next>下一步 →</button></div><p class="lab-boundary">简化状态演示，与本章 SQLite 实验对应；未连接真实数据库，也未模拟并发隔离。</p></section>';
-  if(kind==='retrieval')return '<section class="mini-lab" id="visual-lab"><div class="visual-section-label">动手试一下 · 证据与回答</div><h2>把资料给它，回答应该发生什么变化？</h2><div class="sample-question">问题：样例展馆周二几点闭馆？</div><div class="lab-options" role="group" aria-label="是否提供检索资料"><button type="button" data-retrieval="no" aria-pressed="true">没有相关资料</button><button type="button" data-retrieval="yes" aria-pressed="false">提供相关资料</button></div><div id="retrieval-board" aria-live="polite"></div></section>';
+  if(kind==='bits')return '<section class="mini-lab" id="visual-lab" data-visual-panel><div class="visual-section-label">动手试一下 · 二进制</div><h2>拨动开关，数字会怎样变？</h2><p>亮起的位置计入总数；熄灭的位置贡献 0。</p><div class="bit-switches">'+[8,4,2,1].map((weight,index)=>'<button type="button" data-bit="'+index+'" aria-pressed="'+Boolean([0,1,0,1][index])+'" aria-label="位权 '+weight+'，当前 '+[0,1,0,1][index]+'"><span class="bit-weight">位权 '+weight+'</span><strong>'+[0,1,0,1][index]+'</strong><span class="bit-state">'+([0,1,0,1][index]?'计入':'不计入')+'</span></button>').join('')+'</div><div class="bit-equation" aria-live="polite"><span id="bit-equation">0 × 8 + 1 × 4 + 0 × 2 + 1 × 1</span><span>=</span><strong id="bit-value">5</strong></div><p class="lab-boundary">这里演示 4 位无符号整数，范围 0–15；文字、小数和负数需要另外约定编码。</p></section>';
+  if(kind==='transaction')return '<section class="mini-lab" id="visual-lab" data-visual-panel><div class="visual-section-label">动手试一下 · 事务</div><h2>第二步失败，第一步还算数吗？</h2><p>同一个事务新增两行，看看提交和回滚的区别。</p><div class="lab-options" role="group" aria-label="选择事务情境"><button type="button" data-transaction="failure" aria-pressed="true">制造主键冲突</button><button type="button" data-transaction="success" aria-pressed="false">两次写入都成功</button></div><div id="transaction-board"></div><div class="transaction-status" id="transaction-status" role="status" aria-live="polite"><strong></strong><span></span></div><div class="lab-controls"><button type="button" class="secondary-button" data-transaction-reset>重置</button><span id="transaction-progress"></span><button type="button" class="primary-button" data-transaction-next>下一步 →</button></div><p class="lab-boundary">简化状态演示，与本章 SQLite 实验对应；未连接真实数据库，也未模拟并发隔离。</p></section>';
+  if(kind==='retrieval')return '<section class="mini-lab" id="visual-lab" data-visual-panel><div class="visual-section-label">动手试一下 · 证据与回答</div><h2>把资料给它，回答应该发生什么变化？</h2><div class="sample-question">问题：样例展馆周二几点闭馆？</div><div class="lab-options" role="group" aria-label="是否提供检索资料"><button type="button" data-retrieval="no" aria-pressed="true">没有相关资料</button><button type="button" data-retrieval="yes" aria-pressed="false">提供相关资料</button></div><div id="retrieval-board" aria-live="polite"></div></section>';
   return '';
 }
 
 export function renderVisualLesson(doc,byPath) {
   const lesson=doc.visual;
   const related=lesson.related.map(path=>byPath.get(path)).filter(Boolean);
+  const fullText=visualRoute(doc.path)+'&view=full';
   return '<article class="visual-reader" id="visual-reader">'+
     '<header class="visual-heading"><div class="visual-section-label">'+vEsc(doc.number||'')+' / 图解 '+vEsc(doc.title)+'</div><h1>'+vEsc(lesson.title)+'</h1><p>'+vEsc(lesson.intro)+'</p></header>'+
-    '<section class="explainer" id="visual-explainer" aria-label="图解与分步讲解"><div class="diagram-toolbar"><span><i class="legend-dot"></i>总览关系，再一步步看</span><button type="button" data-zoom-diagram aria-label="放大本章图解">↗ 放大图解</button></div><div class="diagram-viewport" id="diagram-surface" tabindex="0" aria-label="可横向查看的图解">'+scopedDiagram(lesson.svg,'main')+'</div><p class="diagram-pan-hint">图解可左右滑动，也可以点击“放大图解”。</p><div class="step-tabs" role="group" aria-label="选择图解步骤"><button type="button" data-visual-step="-1" aria-pressed="true">总览</button>'+lesson.steps.map((step,index)=>'<button type="button" data-visual-step="'+index+'" aria-pressed="false"><span>'+String(index+1).padStart(2,'0')+'</span>'+vEsc(step.title)+'</button>').join('')+'</div><div class="step-explanation" aria-live="polite"><div><span id="lesson-step-count">全图</span><h2 id="lesson-step-title">先看它们怎样联系</h2><p id="lesson-step-body">'+vEsc(lesson.diagramLabel)+'</p></div><div class="step-arrows"><button type="button" data-step-back disabled aria-label="上一步">←</button><button type="button" data-step-next aria-label="下一步">→</button></div></div></section>'+
+    '<div class="visual-card-progress" hidden><p data-card-status role="status" aria-live="polite" aria-atomic="true"></p><progress data-card-progress max="1" value="1" aria-label="本章卡片阅读进度"></progress></div>'+
+    '<section class="explainer" id="visual-explainer" data-visual-panel aria-label="图解与分步讲解"><div class="diagram-toolbar"><span><i class="legend-dot"></i>总览关系，再一步步看</span><button type="button" data-zoom-diagram aria-label="放大本章图解">↗ 放大图解</button></div><div class="diagram-viewport" id="diagram-surface" tabindex="0" aria-label="可横向查看的图解">'+scopedDiagram(lesson.svg,'main')+'</div><p class="diagram-pan-hint">图解可左右滑动，也可以点击“放大图解”。</p><div class="step-tabs" role="group" aria-label="选择图解步骤"><button type="button" data-visual-step="-1" aria-pressed="true">总览</button>'+lesson.steps.map((step,index)=>'<button type="button" data-visual-step="'+index+'" aria-pressed="false"><span>'+String(index+1).padStart(2,'0')+'</span>'+vEsc(step.title)+'</button>').join('')+'</div><div class="step-explanation" aria-live="polite"><div><span id="lesson-step-count">全图</span><h2 id="lesson-step-title" tabindex="-1" aria-describedby="lesson-step-body">先看它们怎样联系</h2><p id="lesson-step-body">'+vEsc(lesson.diagramLabel)+'</p></div><div class="step-arrows"><button type="button" data-step-back disabled aria-label="上一步">←</button><button type="button" data-step-next aria-label="下一步">→</button></div></div></section>'+
     visualLab(lesson.lab)+
-    (lesson.analogy?'<section class="analogy-panel"><div><span class="visual-section-label">换个熟悉的角度</span><h2>'+vEsc(lesson.analogy.title)+'</h2><p>'+vEsc(lesson.analogy.body)+'</p></div><div class="analogy-limit"><span>这个类比到哪里为止？</span><p>'+vEsc(lesson.analogy.limit)+'</p></div></section>':'')+
-    '<section class="misconception-panel" id="visual-boundary"><h2>这里最容易想错</h2><div><span class="misconception-wrong">容易误解：'+vEsc(lesson.misconception.wrong)+'</span><p>'+vEsc(lesson.misconception.right)+'</p></div></section>'+
-    '<section class="visual-check" id="visual-check"><div class="visual-section-label">先预测，再看解释</div><h2>'+vEsc(lesson.check.prompt)+'</h2><div class="check-options">'+lesson.check.options.map((option,index)=>'<button type="button" data-visual-answer="'+index+'" aria-pressed="false"><span class="option-letter">'+String.fromCharCode(65+index)+'</span><span>'+vEsc(option.text)+'</span></button>').join('')+'</div><div class="check-feedback" aria-live="polite" id="visual-feedback">选一个答案，看看自己是否理解了图中的关系。</div></section>'+
-    '<section class="visual-next" id="visual-next"><div><span class="visual-section-label">继续连接知识</span><h2>把这张图，接到下一张</h2></div><div class="related-visuals">'+related.map(other=>'<a href="'+visualRoute(other.path)+'"><span>'+vEsc(other.title)+'</span><span aria-hidden="true">↗</span></a>').join('')+'</div><a class="full-text-link" href="'+visualRoute(doc.path)+'&view=full">深入完整教材：更多概念、代码实验与参考来源 →</a><p class="visual-source-note">图解提炼自本章公开教材，只展开一个核心机制。详细论述和参考资料在完整教材中。</p></section>'+
+    (lesson.analogy?'<section class="analogy-panel" id="visual-analogy" data-visual-panel><div><span class="visual-section-label">换个熟悉的角度</span><h2>'+vEsc(lesson.analogy.title)+'</h2><p>'+vEsc(lesson.analogy.body)+'</p></div><div class="analogy-limit"><span>这个类比到哪里为止？</span><p>'+vEsc(lesson.analogy.limit)+'</p></div></section>':'')+
+    '<section class="misconception-panel" id="visual-boundary" data-visual-panel><h2>这里最容易想错</h2><div><span class="misconception-wrong">容易误解：'+vEsc(lesson.misconception.wrong)+'</span><p>'+vEsc(lesson.misconception.right)+'</p></div></section>'+
+    '<section class="visual-check" id="visual-check" data-visual-panel><div class="visual-section-label">先预测，再看解释</div><h2>'+vEsc(lesson.check.prompt)+'</h2><div class="check-options">'+lesson.check.options.map((option,index)=>'<button type="button" data-visual-answer="'+index+'" aria-pressed="false"><span class="option-letter">'+String.fromCharCode(65+index)+'</span><span>'+vEsc(option.text)+'</span></button>').join('')+'</div><div class="check-feedback" aria-live="polite" id="visual-feedback">选一个答案，看看自己是否理解了图中的关系。</div></section>'+
+    '<section class="visual-next" id="visual-next" data-visual-panel><div><span class="visual-section-label">继续连接知识</span><h2>把这张图，接到下一张</h2></div><div class="related-visuals">'+related.map(other=>'<a href="'+visualRoute(other.path)+'"><span>'+vEsc(other.title)+'</span><span aria-hidden="true">↗</span></a>').join('')+'</div><a class="full-text-link" href="'+visualRoute(doc.path)+'&view=full">深入完整教材：更多概念、代码实验与参考来源 →</a><p class="visual-source-note">图解提炼自本章公开教材，只展开一个核心机制。详细论述和参考资料在完整教材中。</p></section>'+
+    '<nav class="visual-card-navigation" aria-label="本章卡片导航" hidden><button type="button" class="secondary-button" data-card-back>← 上一张</button><button type="button" class="primary-button" data-card-next>下一张 →</button><a class="primary-button" data-card-finish href="'+fullText+'" hidden>完整教材 →</a></nav>'+
     '<dialog class="diagram-dialog" id="diagram-zoom" aria-label="放大图解"><div class="zoom-header"><strong>'+vEsc(doc.title)+'</strong><button type="button" data-close-zoom aria-label="关闭放大图解">✕</button></div><div class="zoom-canvas" tabindex="0">'+scopedDiagram(lesson.svg,'zoom')+'</div><p>'+vEsc(lesson.diagramLabel)+'</p></dialog></article>';
 }
 
-export function bindVisualReader(root,lesson) {
+export function bindVisualReader(root,lesson,{section,card:savedCard,onCardChange}={}) {
   let step=-1;
   const bits=[0,1,0,1];
   let transactionBranch='failure',transactionStep=0;
+  const cards=visualReadingCards(lesson);
+  const media=root.ownerDocument.defaultView.matchMedia('(max-width: 720px)');
+  let mobile=media.matches;
+  let cardIndex=visualCardIndex(cards,section,mobile?savedCard:null);
+  let notifiedCard=null,disposed=false;
+  const layout=root.closest('.visual-layout');
+  const panels=[...root.querySelectorAll('[data-visual-panel]')];
+  const cardStatus=root.querySelector('[data-card-status]');
+  const cardProgress=root.querySelector('[data-card-progress]');
+  const diagram=root.querySelector('#diagram-surface>svg');
+  const diagramSurface=root.querySelector('#diagram-surface');
+  const fullViewBox=diagram.getAttribute('viewBox');
+
+  function frameDiagram(item) {
+    diagram.setAttribute('viewBox',fullViewBox);
+    diagram.style.minWidth='';
+    const hint=root.querySelector('.diagram-pan-hint');
+    hint.textContent=mobile?'先看整体关系，点“放大图解”核对细节。':'图解可左右滑动，也可以点击“放大图解”。';
+    if(!mobile||!item)return;
+    // Keep a readable crop of the current mechanism, with the complete diagram
+    // always available in the existing zoom dialog. Wide steps remain pannable.
+    const bounds=[...diagram.querySelectorAll('[data-node]')].filter(node=>item.focus.includes(node.dataset.node)).map(node=>node.getBBox());
+    if(!bounds.length)return;
+    const left=Math.min(...bounds.map(box=>box.x))-26;
+    const top=Math.min(...bounds.map(box=>box.y))-26;
+    const width=Math.max(250,Math.max(...bounds.map(box=>box.x+box.width))-left+26);
+    const height=Math.max(150,Math.max(...bounds.map(box=>box.y+box.height))-top+26);
+    diagram.setAttribute('viewBox',[left,top,width,height].join(' '));
+    if(width>540)diagram.style.minWidth=Math.ceil(width*.72)+'px';
+    diagramSurface.scrollLeft=0;
+    hint.textContent=diagramSurface.scrollWidth>diagramSurface.clientWidth+1?'左右滑动看当前步骤，或放大查看全图。':'当前步骤已聚焦，放大可查看全图。';
+  }
+
   function updateStep(next) {
     step=Math.max(-1,Math.min(lesson.steps.length-1,next));
     const item=lesson.steps[step];
@@ -48,6 +84,51 @@ export function bindVisualReader(root,lesson) {
     root.querySelector('#lesson-step-body').textContent=item?item.body:lesson.diagramLabel;
     root.querySelector('[data-step-back]').disabled=step===-1;
     root.querySelector('[data-step-next]').disabled=step===lesson.steps.length-1;
+    frameDiagram(item);
+  }
+
+  function showCard(next,moveFocus=false) {
+    if(disposed)return;
+    cardIndex=Math.max(0,Math.min(cards.length-1,next));
+    const card=cards[cardIndex];
+    const last=cardIndex===cards.length-1;
+    root.classList.toggle('is-card-reader',mobile);
+    root.dataset.visualCard=card.key;
+    layout?.classList.toggle('is-card-layout',mobile);
+    layout?.classList.toggle('is-last-card',mobile&&last);
+    panels.forEach(panel=>{
+      panel.hidden=mobile&&panel.id!==card.section;
+      panel.inert=panel.hidden;
+    });
+    root.querySelector('.visual-card-progress').hidden=!mobile;
+    root.querySelector('.visual-card-navigation').hidden=!mobile;
+    cardStatus.textContent=(cardIndex+1)+' / '+cards.length+' · '+card.label;
+    cardProgress.max=cards.length;
+    cardProgress.value=cardIndex+1;
+    cardProgress.setAttribute('aria-valuetext','第 '+(cardIndex+1)+' 张，共 '+cards.length+' 张：'+card.label);
+    root.querySelector('[data-card-back]').disabled=cardIndex===0;
+    root.querySelector('[data-card-back]').setAttribute('aria-label',cardIndex?'上一张：'+cards[cardIndex-1].label:'已经是第一张卡片');
+    root.querySelector('[data-card-next]').hidden=last;
+    root.querySelector('[data-card-next]').setAttribute('aria-label',last?'已到最后一张':'下一张：'+cards[cardIndex+1].label);
+    root.querySelector('[data-card-finish]').hidden=!last;
+    root.querySelector('.step-explanation').setAttribute('aria-live',mobile?'off':'polite');
+    if(card.step!==undefined)updateStep(card.step);
+    else if(!mobile)frameDiagram(lesson.steps[step]);
+    if(mobile){
+      const panel=panels.find(panel=>panel.id===card.section);
+      const focused=root.ownerDocument.activeElement;
+      const lostFocus=focused&&root.contains(focused)&&focused.closest('[data-visual-panel]')?.hidden;
+      if(moveFocus||lostFocus){
+        const heading=card.key==='overview'?root.querySelector('.visual-heading h1'):panel.querySelector('h2');
+        heading.tabIndex=-1;
+        heading.focus({preventScroll:true});
+        if(moveFocus)root.scrollIntoView({behavior:'instant',block:'start'});
+      }
+      if(card.key!==notifiedCard){
+        notifiedCard=card.key;
+        if(typeof onCardChange==='function')onCardChange(card.key);
+      }
+    }
   }
   function updateBits() {
     root.querySelectorAll('[data-bit]').forEach((button,index)=>{
@@ -82,11 +163,14 @@ export function bindVisualReader(root,lesson) {
   if(lesson.lab==='transaction')updateTransaction();
   if(lesson.lab==='retrieval')updateRetrieval(false);
   const zoom=root.querySelector('#diagram-zoom');
-  zoom.addEventListener('click',event=>{if(event.target===zoom){const bounds=zoom.getBoundingClientRect();if(event.clientX<bounds.left||event.clientX>bounds.right||event.clientY<bounds.top||event.clientY>bounds.bottom)zoom.close();}});
-  root.addEventListener('click',event=>{
-    const stepButton=event.target.closest('[data-visual-step]');if(stepButton)updateStep(Number(stepButton.dataset.visualStep));
-    if(event.target.closest('[data-step-back]'))updateStep(step-1);
-    if(event.target.closest('[data-step-next]'))updateStep(step+1);
+  const onZoomClick=event=>{if(event.target===zoom){const bounds=zoom.getBoundingClientRect();if(event.clientX<bounds.left||event.clientX>bounds.right||event.clientY<bounds.top||event.clientY>bounds.bottom)zoom.close();}};
+  zoom.addEventListener('click',onZoomClick);
+  const onClick=event=>{
+    const stepButton=event.target.closest('[data-visual-step]');if(stepButton)showCard(Number(stepButton.dataset.visualStep)+1);
+    if(event.target.closest('[data-step-back]'))showCard(step);
+    if(event.target.closest('[data-step-next]'))showCard(step+2);
+    if(event.target.closest('[data-card-back]'))showCard(cardIndex-1,true);
+    if(event.target.closest('[data-card-next]'))showCard(cardIndex+1,true);
     if(event.target.closest('[data-zoom-diagram]'))zoom.showModal();
     if(event.target.closest('[data-close-zoom]'))zoom.close();
     const bit=event.target.closest('[data-bit]');if(bit){const index=Number(bit.dataset.bit);bits[index]=1-bits[index];updateBits();}
@@ -103,7 +187,25 @@ export function bindVisualReader(root,lesson) {
       feedback.classList.toggle('correct',option.correct);feedback.classList.toggle('retry',!option.correct);
       feedback.textContent=(option.correct?'✓ 你抓住了关键。':'再想一步。')+' '+option.feedback;
     }
-  });
+  };
+  root.addEventListener('click',onClick);
+  const onMediaChange=event=>{mobile=event.matches;showCard(cardIndex);};
+  media.addEventListener('change',onMediaChange);
+  const beforePrint=()=>diagram.setAttribute('viewBox',fullViewBox);
+  const afterPrint=()=>frameDiagram(lesson.steps[step]);
+  root.ownerDocument.defaultView.addEventListener('beforeprint',beforePrint);
+  root.ownerDocument.defaultView.addEventListener('afterprint',afterPrint);
+  showCard(cardIndex);
+  return ()=>{
+    disposed=true;
+    media.removeEventListener('change',onMediaChange);
+    root.ownerDocument.defaultView.removeEventListener('beforeprint',beforePrint);
+    root.ownerDocument.defaultView.removeEventListener('afterprint',afterPrint);
+    root.removeEventListener('click',onClick);
+    zoom.removeEventListener('click',onZoomClick);
+    if(zoom.open)zoom.close();
+    layout?.classList.remove('is-card-layout','is-last-card');
+  };
 }
 
 export function renderVisualCard(doc,index) {

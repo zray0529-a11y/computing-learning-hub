@@ -20,6 +20,8 @@
   let toastTimer=null;
   let tocObserver=null;
   let disposeAtlas=null;
+  let disposeVisual=null;
+  let disposeFrontier=null;
   let routeGeneration=0, renderedRoute='';
   const content=document.getElementById('content');
   const dialog=document.getElementById('search-dialog');
@@ -82,11 +84,15 @@
     }).join('');
     const home=document.querySelector('a.home-nav');
     const isAtlas=new URLSearchParams(location.hash.slice(1)).has('atlas');
-    home.classList.toggle('active',!activeDoc&&location.hash!=='#bookmarks'&&!isAtlas);
-    if(!activeDoc&&location.hash!=='#bookmarks'&&!isAtlas)home.setAttribute('aria-current','page');else home.removeAttribute('aria-current');
+    const isFrontier=new URLSearchParams(location.hash.slice(1)).has('frontier');
+    home.classList.toggle('active',!activeDoc&&location.hash!=='#bookmarks'&&!isAtlas&&!isFrontier);
+    if(!activeDoc&&location.hash!=='#bookmarks'&&!isAtlas&&!isFrontier)home.setAttribute('aria-current','page');else home.removeAttribute('aria-current');
     const atlasLink=document.getElementById('open-atlas');
     atlasLink.classList.toggle('active',isAtlas);
     if(isAtlas)atlasLink.setAttribute('aria-current','page');else atlasLink.removeAttribute('aria-current');
+    const frontierLink=document.getElementById('open-frontier');
+    frontierLink.classList.toggle('active',isFrontier);
+    if(isFrontier)frontierLink.setAttribute('aria-current','page');else frontierLink.removeAttribute('aria-current');
     document.getElementById('bookmark-count').textContent=state.bookmarks.length;
     document.getElementById('show-bookmarks').classList.toggle('active',location.hash==='#bookmarks');
   }
@@ -98,7 +104,14 @@
     document.title='计算机学习知识库 · 图解版';
     document.getElementById('breadcrumb-current').textContent='图解学习首页';
     content.innerHTML=renderVisualHome(data,state);
+    content.querySelector('.visual-home-hero').insertAdjacentHTML('afterend','<a class="frontier-home-entry" href="#frontier"><div><span class="visual-section-label">知识库补充 · Agent 前沿</span><strong>看看智能体最近又会做什么了。</strong><small>Anthropic · DeepSeek · '+data.frontier.entries.length+' 条有来源的更新 · 核验至 '+data.frontier.checkedAt+'</small></div><b aria-hidden="true">↗</b></a>');
     bindHomeBinary(document.getElementById('home-binary'));
+  }
+  function renderFrontier(params) {
+    document.title='Agent 前沿更新 · 计算机学习知识库';
+    document.getElementById('breadcrumb-current').textContent='Agent 前沿更新';
+    content.innerHTML=renderFrontierPage(data.frontier,byPath,params);
+    disposeFrontier=bindFrontierPage(document.getElementById('frontier-page'),data.frontier,byPath,params);
   }
   function renderAtlas(params) {
     document.title='知识图谱 · 协作场景 · 历史沿革';
@@ -134,7 +147,7 @@
       '<div class="page-neighbors">'+(previous?'<a class="page-neighbor" href="'+route(previous.path)+'"><small>← 上一篇</small><strong>'+esc(previous.title)+'</strong></a>':'<span></span>')+(next?'<a class="page-neighbor next" href="'+route(next.path)+'"><small>下一篇 →</small><strong>'+esc(next.title)+'</strong></a>':'<a class="page-neighbor next" href="#home"><small>回到学习首页 →</small><strong>继续探索知识库</strong></a>')+'</div>'+
       '<div class="reading-source"><button type="button" data-download-source>下载本页'+(doc.path.endsWith('.md')?' Markdown':'原文')+'</button><a href="'+data.repo+'/blob/main/'+doc.path.split('/').map(encodeURIComponent).join('/')+'" target="_blank" rel="noopener noreferrer">在 GitHub 查看源文件 ↗</a><span>内容来源与许可见页脚</span></div></div></div>'+
       (toc?'<aside class="reading-toc" aria-label="本页目录"><h2 class="toc-title">本页目录</h2>'+toc+'</aside>':'')+'</div>';
-    if(visual)bindVisualReader(document.getElementById('visual-reader'),doc.visual);
+    if(visual)disposeVisual=bindVisualReader(document.getElementById('visual-reader'),doc.visual,{section:params.get('section'),card:params.has('resume')?state.cards[doc.path]:null,onCardChange:key=>{if(state.cards[doc.path]!==key)state.positions[doc.path]=0;state.cards[doc.path]=key;save();}});
     if(tocObserver)tocObserver.disconnect();
     if('IntersectionObserver' in window) {
       tocObserver=new IntersectionObserver(entries=>{
@@ -177,6 +190,8 @@
       clearTimeout(scrollTimer);
       rememberPosition();
       if(disposeAtlas){disposeAtlas();disposeAtlas=null;}
+      if(disposeVisual){disposeVisual();disposeVisual=null;}
+      if(disposeFrontier){disposeFrontier();disposeFrontier=null;}
       if(tocObserver){tocObserver.disconnect();tocObserver=null;}
       closeMenu();
       if(dialog.open)dialog.close();
@@ -187,6 +202,7 @@
       if(doc) {
         state.last=doc.path;save();renderDocument(doc,params);
       } else if(params.has('atlas'))renderAtlas(params);
+      else if(params.has('frontier'))renderFrontier(params);
       else if(raw==='bookmarks')renderBookmarks();
       else if(requested) {
         document.getElementById('breadcrumb-current').textContent='未找到章节';

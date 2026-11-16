@@ -17,3 +17,20 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 @media print{body::before{display:none}.sidebar,.topbar,.reading-toc,.mobile-toc,.article-tools,.article-end,.page-footer,.search-dialog,.toast,.home-note,.code-label button{display:none!important}.workspace{margin:0}.reading-layout,.home-wrap{display:block;max-width:none;padding:0}.prose{font-size:11pt;line-height:1.7}.prose pre{white-space:pre-wrap}.table-wrap{overflow:visible}.prose table{min-width:0;font-size:9pt}.prose details{display:block}.prose details>*{display:revert}.prose h2{break-after:avoid}.prose a{color:inherit}.code-block,.diagram{break-inside:avoid}body{background:#fff;color:#000}}
 
 button.quick-card{text-align:left}
+
+@media(max-width:720px){
+  html{scroll-padding-top:76px}
+  .topbar{padding-inline:max(10px,env(safe-area-inset-left,0px)) max(10px,env(safe-area-inset-right,0px));gap:4px}
+  .topbar-left{flex:1;gap:5px}
+  .topbar-actions{gap:0}
+  .topbar .icon-button,.topbar .search-trigger,.topbar .download-button,.sidebar-close{width:44px;height:44px;min-width:44px;justify-content:center}
+  .topbar .download-button span{display:none}
+  .topbar .breadcrumbs{max-width:none}
+  .topbar .breadcrumbs>a,.topbar .breadcrumbs>span:first-of-type{display:none}
+  .sidebar .nav-link,.sidebar .home-nav{min-height:44px;font-size:13px}
+  .primary-button,.secondary-button,.small-action,.mobile-toc summary{min-height:44px}
+  .search-input-row input{font-size:16px}
+  .search-input-row .icon-button,.search-suggestions button{min-height:44px;min-width:44px}
+  .toast{bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+  .page-neighbor{min-height:70px}
+}
