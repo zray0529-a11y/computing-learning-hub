@@ -6,7 +6,7 @@
 
 **[探索 Three.js 知识地图](https://zray0529-a11y.github.io/computing-learning-hub/#atlas)** · 39 个概念与 68 条有解释的关系，三个虚构协作场景，以及附原始来源的 16 个历史坐标。可旋转、点选、筛选，再返回对应章节；支持列表阅读，三维运行时随离线版打包。
 
-**[查看 Agent 前沿更新](https://zray0529-a11y.github.io/computing-learning-hub/#frontier)** · Anthropic、DeepSeek 等官方进展，逐条查看新增能力、教学例子、可用状态与原始来源。配套[前沿机制补充章](docs/15-agent-frontier.md)，区分正式能力、研究原型与实验演示。手机图解支持逐卡学习和底部前后翻页；完整教材继续保留。
+**[查看 Agent 前沿更新](https://zray0529-a11y.github.io/computing-learning-hub/#frontier)** · Anthropic、DeepSeek 等官方进展，逐条查看新增能力、教学例子、可用状态与原始来源。配套[前沿机制补充章](docs/15-agent-frontier.md)，区分正式能力、研究原型与实验演示。通过 [AIHOT](https://aihot.news/) 发现消息线索，再核对官方原文并整理为知识卡。手机图解支持逐卡学习和底部前后翻页；完整教材继续保留。
 
 这份中文学习资料面向计算机初学者，也适合希望理解数字工具与智能系统的建筑、规划和空间专业读者。目标是能解释机制、读懂程序、检查结果，并把知识迁移到小项目中。
 

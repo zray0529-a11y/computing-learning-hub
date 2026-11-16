@@ -104,7 +104,7 @@
     document.title='计算机学习知识库 · 图解版';
     document.getElementById('breadcrumb-current').textContent='图解学习首页';
     content.innerHTML=renderVisualHome(data,state);
-    content.querySelector('.visual-home-hero').insertAdjacentHTML('afterend','<a class="frontier-home-entry" href="#frontier"><div><span class="visual-section-label">知识库补充 · Agent 前沿</span><strong>看看智能体最近又会做什么了。</strong><small>Anthropic · DeepSeek · '+data.frontier.entries.length+' 条有来源的更新 · 核验至 '+data.frontier.checkedAt+'</small></div><b aria-hidden="true">↗</b></a>');
+    content.querySelector('.visual-home-hero').insertAdjacentHTML('afterend','<a class="frontier-home-entry" href="#frontier"><div><span class="visual-section-label">知识库补充 · Agent 前沿</span><strong>看看智能体最近又会做什么了。</strong><small>'+esc([...new Set(data.frontier.entries.map(entry=>entry.vendor))].sort().join(' · '))+' · '+data.frontier.entries.length+' 条有来源的更新 · 核验至 '+data.frontier.checkedAt+'</small></div><b aria-hidden="true">↗</b></a>');
     bindHomeBinary(document.getElementById('home-binary'));
   }
   function renderFrontier(params) {
