@@ -120,16 +120,36 @@ export function renderKnowledgeAtlas(chapters,topics) {
   return '<section class="knowledge-atlas" id="knowledge-atlas" aria-labelledby="atlas-title"><div class="section-heading"><div><span class="visual-section-label">先找到你想弄懂的问题</span><h2 id="atlas-title">一张知识地图，四个入口</h2></div><span class="atlas-note">每个知识点都能点开看图</span></div><div class="atlas-lanes">'+groups.map(group=>'<div class="atlas-lane tone-'+group.tone+'"><header><span>'+group.number+'</span><h3>'+group.title+'</h3></header><p>'+group.question+'</p><div class="atlas-nodes">'+group.items.map(doc=>'<a href="'+visualRoute(doc.path)+'">'+vEsc(doc.title)+'<span aria-hidden="true">↗</span></a>').join('')+'</div></div>').join('')+'</div></section>';
 }
 
+export function bindHomeBinary(root) {
+  if (!root) return;
+  const bits=[0,1,0,1], weights=[8,4,2,1];
+  root.addEventListener('click',event=>{
+    const button=event.target.closest('[data-hero-bit]');
+    if (!button || !root.contains(button)) return;
+    const index=Number(button.dataset.heroBit);
+    if (!Number.isInteger(index) || index<0 || index>3) return;
+    bits[index]=1-bits[index];
+    button.setAttribute('aria-pressed',String(Boolean(bits[index])));
+    button.setAttribute('aria-label','位权 '+weights[index]+'，当前 '+bits[index]);
+    button.querySelector('strong').textContent=bits[index];
+    button.querySelector('span').textContent=bits[index]?'计入':'不计入';
+    root.querySelector('[data-hero-flow="'+index+'"]').classList.toggle('svg-edge-flow',Boolean(bits[index]));
+    const value=bitValue(bits);
+    root.querySelector('#hero-bit-equation').textContent=bits.map((bit,i)=>bit*weights[i]).join(' + ')+' = '+value;
+    root.querySelector('#hero-bit-caption').textContent=bits.join('')+' 表示 '+value+' · 4 位无符号整数：0–15';
+  });
+}
+
 export function renderVisualHome(data,state) {
   const chapters=data.documents.filter(doc=>doc.group==='chapters'&&doc.number);
   const topics=data.documents.filter(doc=>doc.group==='architecture'&&doc.number);
   const resume=data.documents.find(doc=>doc.path===state.last);
   const picks=[chapters[0],chapters[6],chapters[10]];
-  const heroDiagram='<svg viewBox="0 0 500 290" role="img" aria-label="四个位权为8、4、2、1的开关，0101表示5"><text x="30" y="38" class="v-small">四个开关，16 种组合</text>'+[8,4,2,1].map((weight,index)=>{
-    const x=30+index*118,on=index===1||index===3;
-    return '<g><text x="'+(x+43)+'" y="78" text-anchor="middle" class="v-small">'+weight+'</text><rect x="'+x+'" y="94" width="86" height="91" rx="16" class="'+(on?'v-green':'v-box')+'"/><text x="'+(x+43)+'" y="154" text-anchor="middle" class="v-big">'+(on?'1':'0')+'</text><line x1="'+(x+43)+'" y1="190" x2="'+(x+43)+'" y2="208" class="v-dashed"/></g>';
-  }).join('')+'<path d="M73 208v13h354v-13M250 221v18" class="v-line"/><text x="250" y="273" text-anchor="middle" class="v-label">0 + 4 + 0 + 1 = 5</text></svg>';
-  return '<div class="home-wrap visual-home"><section class="visual-home-hero"><div><div class="section-eyebrow"><span class="status-dot"></span> 计算机知识库 · 图解版</div><h1>先看懂一张图，<br>再弄懂一个<em>概念。</em></h1><p>跟着箭头看过程，拨动开关试结果。<br>从具体问题出发，一步步连接抽象知识。</p><div class="hero-buttons"><a class="primary-button" href="'+visualRoute(chapters[0].path)+'">从第一张图开始 <span aria-hidden="true">→</span></a><button type="button" class="text-link" data-jump-atlas>浏览知识地图 ↓</button></div></div><a class="hero-visual" href="'+visualRoute(chapters[0].path)+'"><div class="hero-visual-top"><span>01 / 看得见的二进制</span><span>点开试一试 ↗</span></div>'+heroDiagram+'<span class="hero-visual-caption">“0101”为什么等于 5？</span></a></section><div class="visual-home-strip"><span><strong>18</strong> 张机制图解</span><span><strong>3</strong> 个互动演示</span><span>分步看懂 · 即时自测</span><span>完整教材 · 支持离线</span></div>'+
+  const heroDiagram='<div class="hero-binary" id="home-binary"><p class="hero-binary-intro">四个开关，16 种组合 · 点击 0 / 1 试试看</p><div class="hero-bit-grid" role="group" aria-label="四位二进制开关">'+[8,4,2,1].map((weight,index)=>{
+    const on=index===1||index===3;
+    return '<div class="hero-bit-column"><span class="hero-bit-weight">位权 '+weight+'</span><button class="hero-bit" type="button" data-hero-bit="'+index+'" aria-pressed="'+on+'" aria-label="位权 '+weight+'，当前 '+(on?1:0)+'"><strong>'+(on?1:0)+'</strong><span>'+(on?'计入':'不计入')+'</span></button></div>';
+  }).join('')+'</div><svg class="hero-binary-lines" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="var(--v-line)" stroke-width="1.5">'+[50,150,250,350].map((x,index)=>'<path data-hero-flow="'+index+'" d="M'+x+' 0v22"'+(index===1||index===3?' class="svg-edge-flow"':'')+'/>').join('')+'<path d="M50 22h300M200 22v18" pathLength="1" class="svg-edge-draw"/></g></svg><output class="hero-binary-equation" id="hero-bit-equation" aria-live="polite" aria-atomic="true">0 + 4 + 0 + 1 = 5</output><span class="hero-visual-caption" id="hero-bit-caption">0101 表示 5 · 4 位无符号整数：0–15</span></div>';
+  return '<div class="home-wrap visual-home"><section class="visual-home-hero"><div><div class="section-eyebrow"><span class="status-dot"></span> 计算机知识库 · 图解版</div><h1>先看懂一张图，<br>再弄懂一个<em>概念。</em></h1><p>跟着箭头看过程，拨动开关试结果。<br>从具体问题出发，一步步连接抽象知识。</p><div class="hero-buttons"><a class="primary-button" href="'+visualRoute(chapters[0].path)+'">从第一张图开始 <span aria-hidden="true">→</span></a><button type="button" class="text-link" data-jump-atlas>浏览知识地图 ↓</button></div></div><div class="hero-visual"><div class="hero-visual-top"><span>01 / 看得见的二进制</span><span>就在这里动手试 ↘</span></div>'+heroDiagram+'<a class="hero-chapter-link" href="'+visualRoute(chapters[0].path)+'">进入第 01 章，理解它为什么成立 →</a></div></section><div class="visual-home-strip"><span><strong>18</strong> 张机制图解</span><span><strong>3</strong> 个互动演示</span><span>分步看懂 · 即时自测</span><span>完整教材 · 支持离线</span></div>'+
     (resume?'<a class="visual-resume" href="'+visualRoute(resume.path)+'&resume=1"><span>接着上次的思路</span><strong>'+vEsc(resume.title)+'</strong><span>继续阅读 →</span></a>':'')+
     '<section class="atlas-home-entry" aria-labelledby="atlas-entry-title"><div><span class="visual-section-label">新 · 让知识之间的联系看得见</span><h2 id="atlas-entry-title">走进一个有来路的知识世界。</h2><p>39 个概念，68 条连接。用 Three.js 旋转观察，<br>看它们怎样协作，也看它们为什么逐渐出现。</p><div class="atlas-entry-links"><a href="#atlas">探索关系图谱 →</a><a href="#atlas&mode=scenario">跟着场景走一遍 →</a><a href="#atlas&mode=history">沿时间线回看 →</a></div></div><svg viewBox="0 0 250 155" role="img" aria-label="以连线连接芯片、数据、模型与建筑的知识地图入口示意"><g fill="none" stroke="#91b3a0" stroke-width="1.5"><path d="M45 105 100 45 170 50 212 106 145 125ZM100 45 145 125M45 105 170 50M170 50 145 125"/></g><g stroke-width="2"><rect x="28" y="88" width="34" height="29" rx="6" fill="#d8e9dc" stroke="#6d987d"/><path d="M34 96h22v13H34Z" fill="#78a88a"/><rect x="85" y="29" width="31" height="31" rx="6" fill="#e5e1f4" stroke="#9d8bb5"/><circle cx="169" cy="49" r="19" fill="#dae6f6" stroke="#7c9fc5"/><path d="M136 105h22v31h-22ZM195 89h27v32h-27Z" fill="#f2e7d2" stroke="#b6a271"/></g><g fill="#42604d" font-size="11" text-anchor="middle"><text x="45" y="136">计算</text><text x="99" y="19">智能</text><text x="169" y="20">系统</text><text x="211" y="141">空间</text></g></svg></section>'+
     renderKnowledgeAtlas(chapters,topics)+

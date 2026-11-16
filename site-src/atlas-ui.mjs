@@ -117,6 +117,7 @@ export function bindAtlasPage(root,atlas,byPath,params) {
   // A related concept outside a scenario/history is explored on the whole map.
   if(state.mode!=='graph'&&!atlasViewModel(atlas,state).visibleIds.includes(id))state.mode='graph';
   paint();
+  if(!state.listView&&!errorMessage)scene?.focus(id);
  }
  function onClick(event){
   const button=event.target.closest('button');if(!button||!root.contains(button)||button.disabled)return;

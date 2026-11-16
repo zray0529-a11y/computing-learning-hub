@@ -33,7 +33,7 @@ jobs:
       - name: Verify the public curriculum
         run: python3 -B scripts/verify.py
       - name: Test and build the offline reader
-        run: node --test tests/site.test.mjs && node --test tests/visual.test.mjs && node --test tests/atlas.test.mjs
+        run: node --test tests/*.test.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

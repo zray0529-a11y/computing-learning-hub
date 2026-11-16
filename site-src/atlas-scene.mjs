@@ -1,12 +1,60 @@
 /* Original MIT-licensed miniature knowledge atlas. Three.js is supplied locally. */
 
+/** A finite camera pan: preserve viewing angle/zoom and stop when interrupted. */
+export function createAtlasCameraFlight({ camera, controls, requestRender, win, reducedMotion = () => false, canRun = () => true }) {
+  let frame = 0, destination = null, disposed = false;
+  function cancel() {
+    if (frame) win.cancelAnimationFrame(frame);
+    frame = 0;
+    destination = null;
+  }
+  function moveTo(point) {
+    const delta = point.clone().sub(controls.target);
+    camera.position.add(delta);
+    // OrbitControls constrains target around cursor; move both to avoid clamping.
+    controls.cursor.add(delta);
+    controls.target.copy(point);
+    controls.update();
+    requestRender();
+  }
+  function finish() {
+    if (!destination) return;
+    const point = destination.clone();
+    cancel();
+    if (!disposed && canRun()) moveTo(point);
+  }
+  return {
+    cancel,
+    finish,
+    flyTo(point) {
+      cancel();
+      if (disposed || !canRun()) return;
+      destination = point.clone();
+      if (reducedMotion()) { finish(); return; }
+      const from = controls.target.clone(), to = destination.clone();
+      const started = win.performance.now();
+      function step(now) {
+        frame = 0;
+        if (disposed || !canRun()) { cancel(); return; }
+        if (reducedMotion()) { finish(); return; }
+        const progress = Math.max(0, Math.min(1, (now - started) / 520));
+        moveTo(from.clone().lerp(to, 1 - Math.pow(1 - progress, 3)));
+        if (progress < 1) frame = win.requestAnimationFrame(step);
+        else destination = null;
+      }
+      frame = win.requestAnimationFrame(step);
+    },
+    dispose() { disposed = true; cancel(); },
+  };
+}
+
 /**
  * Creates an on-demand Three.js scene, using SVG when WebGL is unavailable.
  * The surrounding reader owns the equivalent
  * accessible concept list, relation descriptions, and scenario/history controls.
  */
 export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = () => {} } = {}) {
-  const emptyController = { update() {}, reset() {}, zoom() {}, dispose() {} };
+  const emptyController = { update() {}, focus() {}, reset() {}, zoom() {}, dispose() {} };
   let wrapper, renderer, controls, resizeObserver, frame = 0;
   let disposed = false, failed = false, errorReported = false;
   let cleanup = () => {};
@@ -105,6 +153,13 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     let state = { mode: 'graph', selectedId: null, visibleIds: nodeList.map((n) => n.id), focusIds: [] };
     let visibleSet = new Set(state.visibleIds), focusSet = new Set();
     let layoutKey = '', hoveredId = null, pointerStart = null;
+    let isDark = doc.documentElement.dataset.theme === 'dark';
+    const themedMaterials = new Map();
+    const motionPreference = win.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const flight = createAtlasCameraFlight({ camera, controls, requestRender, win,
+      reducedMotion: () => Boolean(motionPreference?.matches),
+      canRun: () => !disposed && !failed && !doc.hidden && !host.hidden,
+    });
     const projectPoint = new T.Vector3();
     const raycaster = new T.Raycaster();
     const pointer = new T.Vector2();
@@ -122,6 +177,12 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     };
     const roundSegments = usingSvg ? 10 : 24;
     const tint = (color, amount = 0.82) => new T.Color(color).lerp(new T.Color(0xffffff), amount);
+    function themed(surface, light, dark) {
+      const colors = { light: new T.Color(light), dark: new T.Color(dark) };
+      themedMaterials.set(surface, colors);
+      surface.color.copy(isDark ? colors.dark : colors.light);
+      return surface;
+    }
     const box = (x, y, z) => ownGeometry(new T.BoxGeometry(x, y, z));
     const mesh = (parent, geometry, surface, x = 0, y = 0, z = 0) => {
       const object = new T.Mesh(geometry, surface);
@@ -292,7 +353,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       group.traverse((object) => {
         if (object.geometry) { object.geometry.dispose(); geometries.delete(object.geometry); }
         const ownSurfaces = Array.isArray(object.material) ? object.material : object.material ? [object.material] : [];
-        ownSurfaces.forEach((surface) => { surface.dispose(); materials.delete(surface); });
+        ownSurfaces.forEach((surface) => { surface.dispose(); materials.delete(surface); themedMaterials.delete(surface); });
       });
       scene.remove(group);
     }
@@ -304,13 +365,15 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       if (options.title) element.title = options.title;
       Object.assign(element.style, { position: 'absolute', transform: 'translate(-50%, -50%)', pointerEvents: 'none', whiteSpace: 'nowrap', color: color || '#52647a' });
       labelLayer.append(element);
-      districtLabels.push({ element, point, ...options });
+      districtLabels.push({ element, point, color: color || '#52647a', ...options });
     }
 
     function platform(centerX, centerZ, sizeX, sizeZ, color) {
-      const deck = mesh(scenery, box(sizeX, 0.13, sizeZ), material(tint(color, 0.94), { roughness: 0.95 }), centerX, -0.08, centerZ);
+      const deckSurface = themed(material(color, { roughness: 0.95 }), tint(color, 0.94), new T.Color(color).lerp(new T.Color('#15231c'), 0.86));
+      const deck = mesh(scenery, box(sizeX, 0.13, sizeZ), deckSurface, centerX, -0.08, centerZ);
       const x = sizeX / 2, z = sizeZ / 2;
       const border = polyline(scenery, [[-x, -z], [x, -z], [x, z], [-x, z], [-x, -z]].map(([a, b]) => new T.Vector3(centerX + a, 0.005, centerZ + b)), tint(color, 0.5), 0.62);
+      themed(border.material, tint(color, 0.5), tint(color, 0.28));
       // SVG uses a painter's algorithm: large floor polygons must stay behind models.
       if (usingSvg) { deck.renderOrder = -30; border.renderOrder = -29; }
     }
@@ -428,7 +491,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
           arrow.quaternion.setFromUnitVectors(up, curve.getTangent(0.9).normalize());
           if (usingSvg) arrow.renderOrder = -5;
         }
-        edgeRecords.push({ edge, line, arrow });
+        edgeRecords.push({ edge, line, arrow, color: new T.Color(color) });
       });
     }
 
@@ -444,41 +507,54 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
         record.marker.visible = selected;
         record.surfaces.forEach(({ surface, color }) => {
           surface.color.copy(color);
-          if (muted) surface.color.lerp(new T.Color('#f1f4f7'), 0.71);
+          if (muted) surface.color.lerp(new T.Color(isDark ? '#263e33' : '#f1f4f7'), 0.71);
         });
         record.label.classList.toggle('is-selected', selected);
         record.label.classList.toggle('is-focused', focused);
         record.label.classList.toggle('is-muted', muted);
         record.label.setAttribute('aria-pressed', selected ? 'true' : 'false');
       });
-      edgeRecords.forEach(({ edge, line, arrow }) => {
+      edgeRecords.forEach(({ edge, line, arrow, color }) => {
         const endpointsVisible = visibleSet.has(edge.from) && visibleSet.has(edge.to);
         const selected = !!state.selectedId && (edge.from === state.selectedId || edge.to === state.selectedId);
         const withinFocus = focusSet.has(edge.from) && focusSet.has(edge.to);
         const showing = endpointsVisible && (state.mode === 'scenario' ? (!hasFocus || withinFocus) : (!state.selectedId || selected));
         line.visible = showing;
+        line.material.color.copy(isDark ? tint(color, 0.3) : color);
         line.material.opacity = selected ? 0.86 : withinFocus ? 0.7 : 0.24;
         if (arrow) {
           arrow.visible = showing;
+          arrow.material.color.copy(line.material.color);
           arrow.material.opacity = selected || withinFocus ? 0.95 : 0.48;
         }
       });
-      districtLabels.forEach(({ element, eventId }) => {
+      districtLabels.forEach(({ element, eventId, color }) => {
         if (eventId) {
           element.classList.toggle('is-selected', eventId === state.eventId);
-          element.style.color = eventId === state.eventId ? '#9b4e2a' : '#718194';
-        }
+          element.style.color = eventId === state.eventId ? (isDark ? '#efbb9c' : '#9b4e2a') : (isDark ? '#9caeba' : '#718194');
+        } else element.style.color = isDark ? '#' + tint(color, 0.38).getHexString() : color;
       });
       eventMarkers.forEach(({ id, marker }) => {
         const current = id === state.eventId;
-        marker.material.color.set(current ? '#bb7753' : '#9ba9b7');
+        marker.material.color.set(current ? (isDark ? '#efbb9c' : '#bb7753') : '#9ba9b7');
         marker.scale.setScalar(current ? 1.65 : 1);
       });
+    }
+
+    function applyAtlasTheme() {
+      if (disposed || failed) return;
+      isDark = doc.documentElement.dataset.theme === 'dark';
+      scene.background = new T.Color(isDark ? '#0b1510' : '#f4f8f5');
+      renderer.setClearColor(scene.background, 1);
+      themedMaterials.forEach((colors, surface) => surface.color.copy(isDark ? colors.dark : colors.light));
+      applyState();
+      requestRender();
     }
 
     function frameCamera(resetPosition = false) {
       const center = new T.Vector3((bounds.minX + bounds.maxX) / 2, 0.15, (bounds.minZ + bounds.maxZ) / 2);
       if (resetPosition) {
+        flight.cancel();
         camera.zoom = 1;
         controls.target.copy(center);
         controls.cursor.copy(center);
@@ -568,6 +644,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
 
     function resize() {
       if (disposed || failed) return;
+      flight.cancel();
       const rectangle = host.getBoundingClientRect();
       width = Math.max(1, Math.round(rectangle.width));
       height = Math.max(1, Math.round(rectangle.height));
@@ -578,6 +655,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
 
     function update(view = {}) {
       if (disposed || failed) return;
+      if (view.selectedId !== undefined && view.selectedId !== state.selectedId) flight.cancel();
       state = { ...state, ...view };
       if (!['graph', 'scenario', 'history'].includes(state.mode)) state.mode = 'graph';
       visibleSet = new Set(Array.isArray(state.visibleIds) ? state.visibleIds : nodeList.map((node) => node.id));
@@ -635,6 +713,7 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     const contextLost = (event) => {
       event.preventDefault();
       failed = true;
+      flight.cancel();
       controls.enabled = false;
       if (frame) win.cancelAnimationFrame(frame);
       frame = 0;
@@ -647,16 +726,23 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
     surface.addEventListener('pointercancel', pointerCancel);
     if (!usingSvg) surface.addEventListener('webglcontextlost', contextLost);
     controls.addEventListener('change', requestRender);
-    const onVisibility = () => { if (!doc.hidden) requestRender(); };
+    controls.addEventListener('start', flight.cancel);
+    const onVisibility = () => { if (doc.hidden) flight.cancel(); else requestRender(); };
+    const onMotionChange = () => { if (motionPreference.matches) flight.finish(); };
     doc.addEventListener('visibilitychange', onVisibility);
+    win.addEventListener('clh:themechange', applyAtlasTheme);
+    motionPreference?.addEventListener?.('change', onMotionChange);
     if (win.ResizeObserver) { resizeObserver = new win.ResizeObserver(resize); resizeObserver.observe(host); }
     else win.addEventListener('resize', resize);
 
     cleanup = () => {
       if (frame) win.cancelAnimationFrame(frame);
+      flight.dispose();
       resizeObserver?.disconnect();
       win.removeEventListener('resize', resize);
       doc.removeEventListener('visibilitychange', onVisibility);
+      win.removeEventListener('clh:themechange', applyAtlasTheme);
+      motionPreference?.removeEventListener?.('change', onMotionChange);
       surface.removeEventListener('pointerdown', pointerDown);
       surface.removeEventListener('pointermove', pointerMove);
       surface.removeEventListener('pointerup', pointerUp);
@@ -664,16 +750,23 @@ export function createAtlasScene(host, { atlas, onSelect = () => {}, onError = (
       surface.removeEventListener('pointercancel', pointerCancel);
       surface.removeEventListener('webglcontextlost', contextLost);
       controls.removeEventListener('change', requestRender);
+      controls.removeEventListener('start', flight.cancel);
     };
     resize();
     update(state);
+    applyAtlasTheme();
     if (doc.fonts?.ready) doc.fonts.ready.then(() => { if (!disposed) requestRender(); }).catch(() => {});
 
     return {
       update,
+      focus(id) {
+        const record = records.get(id);
+        if (!disposed && !failed && record?.visible) flight.flyTo(record.group.position);
+      },
       reset() { if (!disposed && !failed) frameCamera(true); },
       zoom(factor) {
         if (disposed || failed || !Number.isFinite(factor) || factor <= 0) return;
+        flight.cancel();
         camera.zoom = Math.max(controls.minZoom, Math.min(controls.maxZoom, camera.zoom / factor));
         camera.updateProjectionMatrix();
         controls.update();
