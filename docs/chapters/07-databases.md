@@ -27,11 +27,11 @@
 
 假设你用 Excel 一张大表记录观察，每一行都复制房间名“二层201室”。房间后来改名为“二层A201室”，只改一部分行，就会出现同一房间两个名称。每次复制都给下一次修改留下了漏改的机会。
 
-一种整理方法是：房间有稳定的 `entity_id`，当前名称只放在 `entity` 表；观察关系保存这个 ID，需要显示名称时再按 ID 找回来。**规范化（normalization）**就是按事实之间的依赖整理表与关系，减少不必要的重复和更新矛盾。重点不是“表越多越好”，而是先说明每个字段由哪个对象决定。[Microsoft：规范化入门](https://learn.microsoft.com/en-us/previous-versions/troubleshoot/microsoft-365/microsoft-365-apps/access/database-normalization-description)
+一种整理方法是：房间有稳定的 `entity_id`，当前名称只放在 `entity` 表；观察关系保存这个 ID，需要显示名称时再按 ID 找回来。**规范化（normalization）** 就是按事实之间的依赖整理表与关系，减少不必要的重复和更新矛盾。重点不是“表越多越好”，而是先说明每个字段由哪个对象决定。[Microsoft：规范化入门](https://learn.microsoft.com/en-us/previous-versions/troubleshoot/microsoft-365/microsoft-365-apps/access/database-normalization-description)
 
-跨表引用也需要检查：如果 `observation_entity.entity_id` 写了不存在的 `room-999`，数据库应能拒绝这类悬空关系。**外键（foreign key）**用约束要求引用值对应另一张表中存在的键；如果业务不允许空引用，还需相应的非空约束。把多表按键重新组合起来叫 **JOIN（连接）**。[PostgreSQL：外键](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK)
+跨表引用也需要检查：如果 `observation_entity.entity_id` 写了不存在的 `room-999`，数据库应能拒绝这类悬空关系。**外键（foreign key）** 用约束要求引用值对应另一张表中存在的键；如果业务不允许空引用，还需相应的非空约束。把多表按键重新组合起来叫 **JOIN（连接）**。[PostgreSQL：外键](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK)
 
-**类比边界：**拆表只使资料关系更清楚，不能证明 `room-999` 对应现实中的正确房间；存在的对象也可能被错连。若要保留“采集当时的名称”，应明确设计历史版本或快照，不能把所有历史事实都换成当前名称。为了读取速度保留冗余也可能合理，但要说明权威来源、更新方式与允许的滞后。
+**类比边界：** 拆表只使资料关系更清楚，不能证明 `room-999` 对应现实中的正确房间；存在的对象也可能被错连。若要保留“采集当时的名称”，应明确设计历史版本或快照，不能把所有历史事实都换成当前名称。为了读取速度保留冗余也可能合理，但要说明权威来源、更新方式与允许的滞后。
 
 ## 关键概念
 
@@ -50,11 +50,11 @@
 
 如果图纸目录先按楼栋排、同楼栋再按楼层排，找“A楼2层”就可以先缩到 A 楼，再找 2 层。只问“所有楼栋的2层”，则不能直接把整个目录里一个连续的小范围拿出来。
 
-**索引（index）**是数据库另外维护的查询辅助结构；按多个字段组织的叫**复合索引**。“查某相机最近十条观察”包含三个要求：限定 `camera_id`、按 `observed_at` 排序、限制结果数量。以常见的 B-tree（用有序树组织查找的索引）为例，`(camera_id, observed_at)` 像“先楼栋、后楼层”的目录，先找到该相机的一组记录，再沿时间方向取最近十条。[PostgreSQL：多列索引](https://www.postgresql.org/docs/current/indexes-multicolumn.html)
+**索引（index）** 是数据库另外维护的查询辅助结构；按多个字段组织的叫**复合索引**。“查某相机最近十条观察”包含三个要求：限定 `camera_id`、按 `observed_at` 排序、限制结果数量。以常见的 B-tree（用有序树组织查找的索引）为例，`(camera_id, observed_at)` 像“先楼栋、后楼层”的目录，先找到该相机的一组记录，再沿时间方向取最近十条。[PostgreSQL：多列索引](https://www.postgresql.org/docs/current/indexes-multicolumn.html)
 
 因此，“从最左边的字段开始限定”常能更直接地缩小扫描范围，这就是**最左前缀**说法的直觉。它有索引类型和实现条件，不能背成“没查第一列就永远用不上索引”；数据库仍可能选择其他扫描方式。
 
-**类比边界：**目录也要维护，索引会增加空间和写入成本。数据库还会估计条件最后留下多少记录（选择性）以及各种方案的成本，决定扫描全表还是使用索引等步骤；这份方案叫**执行计划**。`EXPLAIN` 可以查看它。“建了索引”不保证每个查询更快，应结合实际数据与测量判断。[PostgreSQL：执行计划](https://www.postgresql.org/docs/current/using-explain.html)
+**类比边界：** 目录也要维护，索引会增加空间和写入成本。数据库还会估计条件最后留下多少记录（选择性）以及各种方案的成本，决定扫描全表还是使用索引等步骤；这份方案叫**执行计划**。`EXPLAIN` 可以查看它。“建了索引”不保证每个查询更快，应结合实际数据与测量判断。[PostgreSQL：执行计划](https://www.postgresql.org/docs/current/using-explain.html)
 
 ## 事务真正保证什么
 
