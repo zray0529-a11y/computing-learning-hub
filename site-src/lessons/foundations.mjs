@@ -161,32 +161,32 @@ export const lessons = [
   },
   {
     path: 'docs/chapters/06-networks.md',
-    title: '请求超时，服务器一定没保存吗？',
-    intro: '超时只说明客户端没有在预算内收到结果，服务器可能已经执行，响应却在返回途中丢失。',
-    diagramLabel: '时间从上向下：客户端发送创建请求，服务器保存一条事件，然后返回响应；响应在途中丢失，客户端最后观察到超时，但服务器已经保存。',
-    svg: picture('f06', '请求执行成功但返回响应丢失的时间线', `
-      ${text(400, 39, '一种可能：已保存，响应丢失')}
-      ${text(123, 83, '客户端')}${text(655, 83, '服务器')}
-      <path d="M 123 102 V 386 M 655 102 V 326" class="v-dashed" fill="none"/>
-      ${node('request', `${arrow('f06', 'M 132 139 H 645')}${text(389, 125, '创建请求：标识 r1', 'v-label')}`)}
-      ${node('commit', `${cell(540, 175, 230, 70, 'v-green')}${text(655, 205, '已保存 1 条事件')}${text(655, 232, '账本记录标识 r1', 'v-small')}`)}
-      ${node('response', `${arrow('f06', 'M 645 280 H 371')}<path d="M 337 269 L 359 291 M 359 269 L 337 291" class="v-line" fill="none"/>${text(483, 267, '响应途中丢失', 'v-small')}`)}
-      ${node('timeout', `${cell(27, 319, 257, 70, 'v-orange')}${text(155, 350, '等待超时')}${text(155, 378, '无法仅凭此确认结果', 'v-small')}`)}
-      ${text(655, 350, '执行已发生', 'v-label')}${text(655, 378, '客户端还不知道', 'v-small')}
-      ${text(400, 419, '时间从上向下；超时还可能有其他原因', 'v-tiny')}
+    title: '输入网址后，怎样拿到网页内容？',
+    intro: '以访问虚构的 https://learn.example/rooms 为例：先找地址，再建立传输与加密保护，最后按 HTTP 交换请求和响应。',
+    diagramLabel: '四个环节顺时针排列：DNS把learn.example解析为IP地址；TCP建立可靠有序的字节传输；TLS核对服务器身份并保护通信；HTTP用GET /rooms请求资源并读取状态码与内容。图示为新建HTTP/1.1或HTTP/2 HTTPS连接的概念流程。',
+    svg: picture('f06', '访问一个HTTPS网址时的四种协议职责', `
+      ${text(400, 35, 'learn.example/rooms', 'v-mono')}
+      ${node('dns', `${cell(35, 65, 330, 132, 'v-blue')}${text(200, 101, '① DNS：查地址')}${text(200, 139, 'learn.example → IP 地址', 'v-small')}${text(200, 175, '不查 /rooms，也不下载网页', 'v-small')}`)}
+      ${arrow('f06', 'M 375 131 H 425')}
+      ${node('tcp', `${cell(435, 65, 330, 132, 'v-purple')}${text(600, 101, '② TCP：建立连接')}${text(600, 139, '按顺序交付字节', 'v-small')}${text(600, 175, '丢失可补传，不是独占专线', 'v-small')}`)}
+      ${arrow('f06', 'M 600 207 V 242')}
+      ${node('tls', `${cell(435, 252, 330, 132, 'v-green')}${text(600, 288, '③ TLS：保护通信')}${text(600, 326, '核对服务器身份', 'v-small')}${text(600, 362, '加密、防篡改', 'v-small')}`)}
+      ${arrow('f06', 'M 425 318 H 375')}
+      ${node('http', `${cell(35, 252, 330, 132, 'v-orange')}${text(200, 288, '④ HTTP：交换消息')}${text(200, 326, 'GET /rooms', 'v-mono')}${text(200, 362, '状态码＋响应内容', 'v-small')}`)}
+      ${text(400, 423, '概念顺序：新建 HTTP/1.1 或 HTTP/2 的 HTTPS 连接', 'v-tiny')}
     `, 440),
     steps: [
-      { title: '发送一个业务请求', body: '客户端给同一业务事件一个稳定标识 r1，再把创建请求发送给服务器。', focus: ['request'] },
-      { title: '远端可能已经执行', body: '在图示情形中，服务器收到请求并保存事件。这个事实不依赖客户端是否收到响应。', focus: ['commit'] },
-      { title: '响应也会出问题', body: '响应可能在返回途中丢失。客户端最终只观察到超时，不能据此证明服务器没有执行。', focus: ['response', 'timeout'] },
-      { title: '重试沿用同一标识', body: '按本章简化账本规则，重试仍用 r1 可返回原结果；换新标识会被当成另一个事件。', focus: ['request', 'commit', 'timeout'] },
+      { title: 'DNS：先问服务器在哪里', body: 'DNS是域名查询规则。浏览器为learn.example查找IP地址；网址中的/rooms是资源路径，不交给DNS查。缓存命中时可复用已有结果。', focus: ['dns'] },
+      { title: 'TCP：建立字节传输连接', body: 'TCP负责在这个连接内按顺序交付字节，并处理丢失后的补传。它像连续水流，不保留应用消息的边界，也不会为你独占一条线路。', focus: ['tcp'] },
+      { title: 'TLS：给通信加保护', body: '这个示例在TCP之上核对服务器身份并建立加密保护。TLS保护传输内容，但不能证明网页内容真实，或替应用决定用户权限。', focus: ['tls'] },
+      { title: 'HTTP：说清请求和响应', body: '浏览器按HTTP约定发出GET /rooms，服务器返回状态码和内容。HTTP解释消息的含义；真正的访问还可能复用连接，并继续请求图片等资源。', focus: ['http'] },
     ],
-    analogy: { title: '收据没送到', body: '包裹已入库但收据丢失，对应服务端已处理而客户端没有收到确认。', limit: '数字请求容易复制；完整去重还要考虑并发、持久化和标识保留期限。' },
-    misconception: { wrong: 'TCP 可靠，所以业务不会重复执行。', right: 'TCP 处理连接内的可靠有序字节流，不认识业务事件。同一创建动作发成两次请求，仍需要应用层的幂等设计。' },
-    check: { prompt: '按本章顺序执行的简化账本：r1 已保存且响应丢失。改用新标识 r2 重试后，有几条记录？', options: [
-      { text: '两条', correct: true, feedback: '账本用标识区分事件，r2 是新标识，因此会新增一条。' },
-      { text: '一条，内容相同就自动去重', correct: false, feedback: '本例按请求标识去重，不是按内容相似去重；新标识会被视为新事件。' },
-      { text: '零条，超时会撤销远端写入', correct: false, feedback: '客户端超时不会自动撤销服务器已经完成的保存。' },
+    analogy: { title: '查地址、运输、保护、读公文', body: 'DNS像查门牌；TCP像按序传递材料；TLS像核验收件方并保护运输；HTTP像约定申请单和回函的格式。', limit: '这不是四个物理关卡。缓存和连接复用会省去部分步骤；HTTP/3使用基于UDP的QUIC，不走这条TCP路径。' },
+    misconception: { wrong: 'DNS查到了地址，就已经拿到网页；加密后内容也一定真实。', right: 'DNS负责找地址，HTTP负责请求与响应的含义，TLS保护通信。找到服务器、保护传输、验证业务内容，是不同任务。' },
+    check: { prompt: '访问https://learn.example/rooms时，域名与资源路径分别由谁解释？', options: [
+      { text: 'DNS查learn.example的地址，HTTP请求/rooms资源。', correct: true, feedback: '域名用来定位服务，路径用来标识服务里的资源；这正是两层不同的职责。' },
+      { text: 'DNS直接查出/rooms的页面内容。', correct: false, feedback: 'DNS不负责下载页面。地址找到之后，还要按应用协议请求内容。' },
+      { text: 'TCP负责解释/rooms是哪一间房。', correct: false, feedback: 'TCP交付字节，不理解房间或资源路径的业务含义。' },
     ] },
     related: ['docs/chapters/03-programming.md', 'docs/chapters/09-distributed-systems.md'],
   },

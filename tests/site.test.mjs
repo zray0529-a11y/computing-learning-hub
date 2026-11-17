@@ -68,11 +68,14 @@ test('the built reader preserves all lessons, folded answers, diagrams and local
   const data=JSON.parse(match[1]);
   assert.equal(data.documents.filter(d=>d.group==='chapters'&&d.number).length,14);
   assert.equal(data.documents.filter(d=>d.group==='architecture'&&d.number).length,4);
-  assert.equal(data.documents.reduce((n,d)=>n+(d.html.match(/<details>/g)||[]).length,0),28);
   assert.equal(data.documents.reduce((n,d)=>n+(d.html.match(/aria-label="教材流程图"/g)||[]).length,0),3);
   const byPath=new Map(data.documents.map(d=>[d.path,d]));
   for(const doc of data.documents) {
     assert.equal(doc.source,readFileSync(new URL('../'+doc.path,import.meta.url),'utf8'),'Source must remain complete: '+doc.path);
+    const sourceFolds=(doc.source.match(/^<details>\s*$/gm)||[]).length;
+    const diagramFolds=(doc.source.match(/^(?:```|~~~)mermaid\s*$/gm)||[]).length;
+    assert.equal((doc.html.match(/<details>/g)||[]).length,sourceFolds+diagramFolds,'Every source fold and diagram-source fold must survive: '+doc.path);
+    assert.equal((doc.html.match(/<\/details>/g)||[]).length,sourceFolds+diagramFolds,'Folded content must close within its document: '+doc.path);
     for(const link of doc.html.matchAll(/href="(#doc=[^"]+)"/g)) {
       const route=new URLSearchParams(link[1].slice(1).replace(/&amp;/g,'&'));
       const target=byPath.get(route.get('doc'));

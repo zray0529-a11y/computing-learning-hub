@@ -122,7 +122,7 @@ export const lessons = [
     path: 'architecture/03-gis-and-context.md',
     title: '模型移到场地，为什么不能只改坐标标签？',
     intro: '先确定坐标基准、轴向和单位，再计算变换；改参考标识本身不会改变坐标数值。',
-    diagramLabel: '左侧4米乘3米局部矩形经逆时针90度旋转和平移后成为目标坐标中的矩形；右图叠加虚构查询区域，点P位于区域内，点Q位于外。',
+    diagramLabel: '左侧4米乘3米局部矩形经逆时针90度旋转和平移后成为蓝色模型图层；右图独立的虚构查询矩形为x在98到102米、y在201到203米，P为99、202位于内部，Q为103、203.5位于外部。',
     svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="局部矩形变换到统一坐标，再与查询区域比较">
       <title>先解释坐标，再变换和叠加</title>
       <g data-node="gis-local" class="v-node">
@@ -156,12 +156,12 @@ export const lessons = [
         <text x="577" y="89" text-anchor="middle" class="v-tiny">模型图层</text>
       </g>
       <g data-node="gis-query" class="v-node">
-        <rect x="550" y="136" width="166" height="92" rx="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="7 5"/>
-        <circle cx="586" cy="176" r="8" class="v-green"/>
-        <text x="600" y="183" text-anchor="start" class="v-label">P</text>
-        <circle cx="733" cy="112" r="8" class="v-orange"/>
-        <text x="745" y="119" text-anchor="start" class="v-label">Q</text>
-        <text x="659" y="212" text-anchor="middle" class="v-tiny">查询区</text>
+        <rect x="558" y="135" width="152" height="76" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="7 5"/>
+        <circle cx="596" cy="173" r="8" class="v-green"/>
+        <text x="610" y="180" text-anchor="start" class="v-label">P</text>
+        <circle cx="748" cy="116" r="8" class="v-orange"/>
+        <text x="762" y="123" text-anchor="start" class="v-label">Q</text>
+        <text x="670" y="200" text-anchor="middle" class="v-tiny">查询区</text>
         <text x="620" y="337" text-anchor="middle" class="v-small">按区域查点：P在内，Q在外</text>
       </g>
       <text x="40" y="371" text-anchor="start" class="v-label">核对变换：面积仍为12 m²，对角线仍为5 m</text>
@@ -171,7 +171,7 @@ export const lessons = [
     steps: [
       { title: '数值必须有解释', body: '先说明原点、轴向和单位；4000毫米应换算成4米，不能只改单位标签。', focus: ['gis-local'] },
       { title: '变换重新算坐标', body: '先换成米，再旋转90°并平移；这次局部刚体变换保留长度与面积。', focus: ['gis-transform', 'gis-layers'] },
-      { title: '统一后再叠加查询', body: '模型图层和查询区使用同一坐标解释，才能按边界判断P在内、Q在外。', focus: ['gis-layers', 'gis-query'] },
+      { title: '统一后再叠加查询', body: '查询矩形x为98到102米、y为201到203米。P=(99,202)在内部，Q=(103,203.5)在外；边界点是否算入，另需约定规则。', focus: ['gis-layers', 'gis-query'] },
       { title: '检查不止一个角点', body: '用多个控制点核对方向、距离和位置；平面重合还不能证明高程正确。', focus: ['gis-local', 'gis-layers'] }
     ],
     analogy: { title: '像把两张透明图叠在一起', body: '先对齐比例、方向和基准，再比较图上的对象；图层对应不同来源的空间数据。', limit: '地理参考系统还涉及投影、轴顺序与高程；屏幕上拖到重合不能替代变换定义。' },
