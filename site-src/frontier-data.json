@@ -1,12 +1,76 @@
 {
   "schemaVersion": 1,
-  "checkedAt": "2026-11-16",
-  "updatedAt": "2026-11-16",
+  "checkedAt": "2026-11-17",
+  "updatedAt": "2026-11-17",
   "updatePolicy": {
     "mode": "scheduled",
     "scheduleLabel": "每周二、周五 09:00（北京时间）"
   },
   "entries": [
+    {
+      "id": "anthropic-claude-code-verification-20261116",
+      "date": "2026-11-16",
+      "dateLabel": "公告",
+      "vendor": "Anthropic",
+      "status": "research",
+      "statusLabel": "工程实践 · 非新产品",
+      "title": "Claude Code 团队：让 Agent 用证据验证交付",
+      "summary": "Claude Code 团队公开了验证方法：优先测试真实端到端流程，配合属性测试和新旧实现的差分测试，并建立提交验证门禁。这是工程实践分享，不是宣布新模型能力。",
+      "mechanism": "先明确用户视角的完成条件；让 Agent 实际运行系统、保留操作轨迹与失败证据；用不变量和随机输入检查边界，用相同输入比较新旧实现；将构建、测试和代码检查放在提交前，验证门禁先观察再强制。验证结果要对应当前提交。",
+      "example": "虚构教学例：修改知识库的手机翻页按钮后，在窄屏真实点击，用属性测试检查页码不越界，再对照旧版确认桌面行为未意外变化，最后将测试证据关联到待发布提交。",
+      "boundary": "文章是团队经验与内部测试，不代表所有 Agent 自动具备上述测试工具，也不保证完全发现缺陷；团队代码比例和测试收益不能当作行业普遍结果。本站未运行 Claude Code。",
+      "sources": [
+        {
+          "label": "Claude Code 开发者博客：2026-11-16 工程实践",
+          "url": "https://claude.dev/blog/how-the-claude-code-team-thinks-about-verification/"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/jy89axg8rd82ugct5uwh5psaq"
+        }
+      ],
+      "related": [
+        "docs/chapters/08-software-engineering.md",
+        "docs/chapters/12-agents.md",
+        "docs/chapters/13-security-and-reliability.md"
+      ]
+    },
+    {
+      "id": "microsoft-tokeneconomizer-20261116",
+      "date": "2026-11-16",
+      "dateLabel": "公告",
+      "vendor": "Microsoft Research",
+      "status": "research",
+      "statusLabel": "开源研究 · 试验结果",
+      "title": "TokenEconomizer：让编码 Agent 从历史会话中减少浪费",
+      "summary": "微软研究院等团队发布 TokenEconomizer 开源插件。在六个仓库的 277 个 SWE-Bench 修复任务中，研究报告多个 Agent 组合的平均任务成本降低 18.4%–30.9%；这是特定实验条件下的结果。",
+      "mechanism": "不改底层模型，在每轮任务结束后读取历史日志：把反复确认的仓库知识压缩为微技能；按仓库历史暂时裁剪低频工具并支持恢复；检测连续失败时提示改变方法，随后根据新证据修正相关判断。",
+      "example": "虚构教学例：连续维护同一个公开练习网页，保存已验证的测试命令与常见文件位置；新任务少加载无关工具，卡在重复错误时建议换检查方法，并同时比较 token 费用和验收质量。",
+      "boundary": "18.4%–30.9%并非生产环境保底节省；初期任务可能增加开销，工具裁剪也会有漏掉罕见需求的风险。本站没有安装插件或独立复现实验；会话经验不等于模型权重更新。",
+      "sources": [
+        {
+          "label": "Microsoft Research：2026-11-16 官方介绍",
+          "url": "https://www.microsoft.com/en-us/research/blog/tokeneconomizer-learning-from-experience-to-make-ai-coding-agents-more-efficient/"
+        },
+        {
+          "label": "微软研究论文入口",
+          "url": "https://www.microsoft.com/en-us/research/publication/tokeneconomizer-experience-driven-black-box-cost-control-for-coding-agents/"
+        },
+        {
+          "label": "官方开源代码",
+          "url": "https://github.com/microsoft/TokenEconomizer"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/ub0r10tgaq7g5nnq01ciz9d17"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/08-software-engineering.md",
+        "docs/chapters/09-distributed-systems.md"
+      ]
+    },
     {
       "id": "deepseek-harness-preview",
       "date": "2026-11-16",
