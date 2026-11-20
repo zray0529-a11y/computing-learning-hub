@@ -1,12 +1,125 @@
 {
   "schemaVersion": 1,
-  "checkedAt": "2026-11-17",
-  "updatedAt": "2026-11-17",
+  "checkedAt": "2026-11-20",
+  "updatedAt": "2026-11-20",
   "updatePolicy": {
     "mode": "scheduled",
     "scheduleLabel": "每周二、周五 09:00（北京时间）"
   },
   "entries": [
+    {
+      "id": "google-gemini-api-tool-retrieval-20261119",
+      "date": "2026-11-19",
+      "dateLabel": "公告",
+      "vendor": "Google",
+      "status": "preview",
+      "statusLabel": "API 预览 · Interactions API",
+      "title": "Gemini Tool Retrieval：工具多时按需加载参数定义",
+      "summary": "Google 于 11 月 19 日宣布 Gemini Interactions API 的 Tool Retrieval 预览功能。大型工具库可先暴露工具名称与描述，等模型选中工具才加载完整参数定义，以减少不必要的上下文开销。",
+      "mechanism": "请求中声明 tool_search，并对部分函数或远程 MCP 工具设置 defer_loading；模型先根据名称和描述检索，再由服务端在同一请求中补充所选工具的参数 schema，随后发出正常函数调用。已有自建工具注册表时还可使用客户端检索，按权限返回候选定义。",
+      "example": "虚构教学例：给课程助手提供查词典、运行练习、检查链接等 60 个工具。先让模型按名称选出本题需要的两个工具，再加载它们的参数定义，并对比全量加载与按需加载的 token 用量及选错率。",
+      "boundary": "目前是预览功能，限适配的 Gemini Interactions API 与支持的模型；工具检索不等于授予权限或自动执行。检索有固定 token 开销，加载后的 schema 仍计费；工具少或高频调用时未必节省，准确性需按实际任务测量。",
+      "sources": [
+        {
+          "label": "Google 官方公告：2026-11-19",
+          "url": "https://blog.google/innovation-and-ai/technology/developers-tools/gemini-api-tool-retrieval/"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/n3npoqbr48wu58cke5p3ox18l"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/06-networks.md",
+        "docs/chapters/08-software-engineering.md"
+      ]
+    },
+    {
+      "id": "openai-performance-factory-20261119",
+      "date": "2026-11-19",
+      "dateLabel": "公告",
+      "vendor": "OpenAI",
+      "status": "research",
+      "statusLabel": "内部工程实践 · 非公开产品",
+      "title": "Performance Factory：用事件唤醒 Agent 完成故障闭环",
+      "summary": "OpenAI 分享 Codex 驱动的内部性能工程系统：发现延迟回归后，Agent 调查、提出修复供工程师审阅，待部署完成再自动核验是否恢复。这是内部生产实践公开，不是对外发布的新服务。",
+      "mechanism": "任务服务保存状态与允许的转换；分派循环把就绪任务送到云端 Codex；服务身份限定工具权限；订阅 GitHub 审阅评论、CI 或部署等事件，在等待期间暂停 Agent 而不是持续轮询。另用独立会话反驳最初的故障归因，保留证据与人工发布门禁。",
+      "example": "虚构教学例：公开练习站首页加载时间突然变长，监控创建待调查任务；Agent 找到可疑图片变更，第二个会话尝试推翻这一结论，开发者审核修复并上线；部署事件唤醒 Agent 对比修复前后延迟，未恢复则重新调查。",
+      "boundary": "来源记录的是 OpenAI 自身工程流程，不能据此认为所有 Codex 用户都有 Performance Factory 或同等内部观测权限。自动调查不等于自动批准上线；文中结果未在本站复现，跨项目效益仍需实测。",
+      "sources": [
+        {
+          "label": "OpenAI 工程博客：2026-11-19",
+          "url": "https://openai.com/index/how-openai-performance-factory-keeps-chatgpt-fast/"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/alwgjr29158n454prl9tjmmw1"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/09-distributed-systems.md",
+        "docs/chapters/13-security-and-reliability.md",
+        "docs/chapters/08-software-engineering.md"
+      ]
+    },
+    {
+      "id": "google-gemini-mac-computer-use-20261119",
+      "date": "2026-11-19",
+      "dateLabel": "公告",
+      "vendor": "Google",
+      "status": "released",
+      "statusLabel": "逐步开放 · 美国英语与设备限定",
+      "title": "Gemini Mac 电脑操作：后台隔离窗口与关键动作审批",
+      "summary": "Google 公告 Gemini Mac 应用开始推出电脑操作功能，可在本地文件、桌面应用及网页之间完成多步骤任务。它在独立后台窗口执行，让用户保留主屏和光标，并可预览、暂停及批准关键动作。",
+      "mechanism": "用户描述任务并指定允许访问的应用；Agent 在独立窗口内观察界面、点击、输入和滚动，持续取得操作反馈；用户可以实时查看执行过程、暂停和批准重要操作。操作窗口与用户主桌面分开，执行权限仍由应用授权范围决定。",
+      "example": "虚构教学例：让助手在一台练习用 Mac 上把三个公开图片文件整理成演示文稿；先限定只访问练习文件夹和演示软件，观察后台窗口的点击结果，在写入其他目录前由用户决定是否授权。",
+      "boundary": "2026-11-19 公告时仅在美国、英语环境逐步推出；要求 Apple Silicon Mac、macOS 15.0+、年满 18 岁的个人 Google 账户及指定付费套餐。后台窗口不是安全沙箱的保证，不能推出适用于其他国家、系统或所有用户，也不代表本站亲自测试。",
+      "sources": [
+        {
+          "label": "Google 官方功能公告：2026-11-19",
+          "url": "https://blog.google/innovation-and-ai/products/gemini-app/computer-use-mac/"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/h5xjk79bhcu8vgnbrynj208uj"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/05-operating-systems.md",
+        "docs/chapters/13-security-and-reliability.md"
+      ]
+    },
+    {
+      "id": "google-gemini-4-neon-agents-20261118",
+      "date": "2026-11-18",
+      "dateLabel": "公告",
+      "vendor": "Google DeepMind",
+      "status": "released",
+      "statusLabel": "已发布 · 渠道与订阅条件不同",
+      "title": "Gemini 4 Neon：面向长任务的可控编排模型",
+      "summary": "Google 11 月 18 日发布 Gemini 4 Neon，面向复杂软件工程、知识工作和多步任务，已向 Gemini API、Antigravity 和部分订阅产品推送。官方重点介绍中途修正指令的可控性、工具密集任务与上下文整理能力。",
+      "mechanism": "这是模型层更新，而非独立执行框架；在支持工具的 Agent 环境中，模型根据执行反馈推进多步工作、减少重复读取，并可作为编排者协调子任务。提供四档思考强度，用于调节推理投入；任务状态、权限和验证仍由周边系统实现。",
+      "example": "虚构教学例：把课程网页的三个独立错误分别交给执行工具修复，协调模型根据测试报告调整后续计划；中途要求先保证无障碍按钮可用，比较不同思考强度下任务完成率、总耗时和 token。",
+      "boundary": "模型正式发布不等于任何账户均可用；API、商业版和个人订阅产品有不同准入与逐步推送条件。排名、成本与诚实性指标来自指定评测或厂商陈述，不能当作任意项目的成功保证；本站未独立调用该模型。",
+      "sources": [
+        {
+          "label": "Google DeepMind 官方发布：2026-11-18",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/lp0snt9lfrx5ju7mg3wma6hnw"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/08-software-engineering.md",
+        "docs/chapters/13-security-and-reliability.md"
+      ]
+    },
     {
       "id": "anthropic-claude-code-verification-20261116",
       "date": "2026-11-16",
