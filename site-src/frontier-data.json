@@ -1,12 +1,128 @@
 {
   "schemaVersion": 1,
-  "checkedAt": "2026-11-20",
-  "updatedAt": "2026-11-20",
+  "checkedAt": "2026-11-24",
+  "updatedAt": "2026-11-24",
   "updatePolicy": {
     "mode": "scheduled",
     "scheduleLabel": "每周二、周五 09:00（北京时间）"
   },
   "entries": [
+    {
+      "id": "anthropic-claude-ship-20261123",
+      "date": "2026-11-23",
+      "dateLabel": "公告",
+      "vendor": "Anthropic",
+      "status": "preview",
+      "statusLabel": "Beta · Team / Enterprise · GitHub",
+      "title": "Claude Ship：评审、修复与审批分工",
+      "summary": "Anthropic 于 11 月 23 日推出 Claude Ship 测试版，把代码提交后的评审、问题修复和审批判断组织为可自动推进的流程。原有 Code Review 已正式开放，两项新 Agent 仍为 beta。",
+      "mechanism": "Code Review 对照代码库检查变更并发布发现；PR Steward 响应 CI 失败、冲突和评审意见，推送修复并说明撤销方式，但不批准或合并；Claude Approvals 根据仓库中的策略文件判断是否需要人工签核。可先只观察审批结果，再配置分支保护。",
+      "example": "虚构教学例：练习网站的翻页改动打开 PR 后，评审发现边界错误，修复 Agent 更新代码并重新触发测试。策略允许普通文案变更自动批准，但权限配置变更必须由维护者确认。",
+      "boundary": "面向 Team 和 Enterprise 的 GitHub 仓库，部分安全配置不支持；/ship 正逐步推出。批准并不等于已经合并，仍受权限、分支保护和必需检查约束。模型可能漏掉缺陷，按 token 计费，本站未实际接入。",
+      "sources": [
+        {
+          "label": "Claude 官方公告：2026-11-23",
+          "url": "https://claude.com/resources/articles/introducing-claude-ship"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/t7jlbaldqf2zcliuva1sofoks"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/08-software-engineering.md",
+        "docs/chapters/13-security-and-reliability.md"
+      ]
+    },
+    {
+      "id": "google-deepmind-lean-agent-teams-20261123",
+      "date": "2026-11-23",
+      "dateLabel": "公告",
+      "vendor": "Google DeepMind",
+      "status": "research",
+      "statusLabel": "研究实践 · 形式化验证",
+      "title": "多 Agent 加 Lean：只共享通过证明检查的算法改进",
+      "summary": "Google DeepMind 在 11 月 23 日公开量子算法优化实验，使用 Gemini 4 智能体团队与 Lean 形式化证明。对应预印本首次提交于 11 月 6 日，11 月 16 日更新至 v3，并非 23 日首次发表。",
+      "mechanism": "多支独立团队探索同一问题的不同算法方案；先通过 Lean 检查证明，再将成果写入共享笔记，按四小时间隔组织跨团队交流与比较。正确性检查与计算资源优化目标分开，研究人员负责定义问题规格。",
+      "example": "虚构教学例：让三个智能体分别尝试改进一个排序算法，要求先证明输出仍有序且元素集合不变，再把通过验证的方案汇总，比较操作次数。",
+      "boundary": "形式化证明只能保证已编码规格下的数学性质，不能替代规格审查。论文报告的是特定量子线路的资源估算改进，未在对应规模的量子硬件上运行；不保证一般软件任务也获同等收益。本站仅核对官方博客与论文摘要、版本记录。",
+      "sources": [
+        {
+          "label": "Google DeepMind 官方研究公告：2026-11-23",
+          "url": "https://deepmind.google/blog/finding-faster-quantum-algorithms-with-agents-and-formal-verification/"
+        },
+        {
+          "label": "原论文摘要及版本历史",
+          "url": "https://arxiv.org/abs/2611.09822"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/pjpgapf3mbvmy98cywxhwf07n"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/08-software-engineering.md",
+        "docs/chapters/13-security-and-reliability.md"
+      ]
+    },
+    {
+      "id": "deepseek-harness-023-alpha-20261122",
+      "date": "2026-11-22",
+      "dateLabel": "公告",
+      "vendor": "DeepSeek",
+      "status": "experimental",
+      "statusLabel": "Alpha 预发布 · 时间线为实验功能",
+      "title": "DeepSeek Harness 0.2.3 Alpha：任务树、阻塞与会话状态可视化",
+      "summary": "11 月 22 日官方发布 0.2.3-alpha.1，新增实验性任务时间线、会话状态区域及代码审阅界面；同日 alpha.2 调整 Node.js 版本要求。与此前通用框架预览相比，这次明确扩展了对执行过程的观察能力。",
+      "mechanism": "时间线将任务树、阻塞事项和进展报告呈现在界面中；会话状态区域汇集工作目录、子智能体、任务、插件与变更请求。插件市场支持 Git 仓库来源，并增加统一连接器账号管理及 MCP OAuth 凭据刷新。",
+      "example": "虚构教学例：课程站同时修复两个互不依赖的页面，让维护者在任务树中看到哪个子任务正在等待测试、哪个已交付变更，再打开审阅界面检查差异，而不是仅根据聊天文本判断进度。",
+      "boundary": "这两个版本均为预发布，时间线明确为实验性插件。可视化不等于可靠的断点恢复、写入隔离或自动验收；连接器权限仍须审核。alpha.2 的 Node.js 要求见发布说明，本站未安装或运行这些版本。SuperAgent 研究原型不是此次正式产品发布。",
+      "sources": [
+        {
+          "label": "官方 alpha.1 发布说明：2026-11-22",
+          "url": "https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.3-alpha.1"
+        },
+        {
+          "label": "官方 alpha.2 发布说明：2026-11-22",
+          "url": "https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.3-alpha.2"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/08-software-engineering.md",
+        "docs/chapters/13-security-and-reliability.md"
+      ]
+    },
+    {
+      "id": "anthropic-enterprise-computer-use-20261120",
+      "date": "2026-11-20",
+      "dateLabel": "公告",
+      "vendor": "Anthropic",
+      "status": "preview",
+      "statusLabel": "Beta · Team / Enterprise 逐步开放",
+      "title": "Claude 企业电脑操作：应用授权与文件访问边界",
+      "summary": "11 月 20 日 Claude 产品更新记录确认 Team 和 Enterprise 开始逐步获得电脑操作 beta，默认关闭。管理员可以控制允许的应用；Enterprise 还可按自定义角色限制用户。",
+      "mechanism": "Claude 通过桌面应用获取屏幕截图并执行点击、输入等操作；组织启用统一 Chat/Cowork 体验后配置电脑操作，用户仍需批准应用。开启远程 Computer access 时可从网页或手机操作运行着桌面客户端的电脑，两项设置职责不同。",
+      "example": "虚构教学例：在专用练习电脑上仅允许演示软件，令 Agent 整理公开素材；维护者检查它操作的应用和生成的文件，另用操作系统账户隔离不应读取的资料。",
+      "boundary": "官方明确提示应用之间没有安全沙箱保证；通过获准应用可能访问连接目录之外的文件，连接目录的只读设定也不适用于电脑操作。部分组织安全配置不兼容；不能推广为所有 Claude 模式或所有账户均可用。本站未执行电脑操作。",
+      "sources": [
+        {
+          "label": "Claude 官方产品更新：2026-11-20",
+          "url": "https://support.claude.com/en/articles/12138966-release-notes"
+        },
+        {
+          "label": "官方企业设置与安全限制",
+          "url": "https://support.claude.com/en/articles/18483812-set-up-computer-use-for-team-and-enterprise-plans"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/05-operating-systems.md",
+        "docs/chapters/13-security-and-reliability.md"
+      ]
+    },
     {
       "id": "google-gemini-api-tool-retrieval-20261119",
       "date": "2026-11-19",
