@@ -32,6 +32,7 @@
     {"path":"architecture/03-gis-and-context.md","title":"GIS 与场地分析","group":"architecture","number":"03","description":"从坐标和单位入手，让空间查询更准确。"},
     {"path":"architecture/04-digital-twins.md","title":"数字孪生与建筑运维","group":"architecture","number":"04","description":"连接模型、设备、观察和时间，追溯真实状态。"},
     {"path":"docs/15-agent-frontier.md","title":"Agent 前沿：能力与机制","group":"frontier","description":"长任务、多智能体、工具、记忆与 Skills；从官方进展理解机制和边界。"},
+    {"path":"docs/16-model-training-and-data-loop.md","title":"行业模型研发与数据进化闭环","group":"frontier","description":"分清数据规模、模型参数、MoE、后训练和可验证的数据学习循环。"},
     {"path":"docs/03-learning-method.md","title":"怎样真正学会","group":"practice"},
     {"path":"docs/practice/01-labs.md","title":"六个动手实验","group":"practice"},
     {"path":"docs/practice/02-capstone.md","title":"贯穿项目","group":"practice"},
