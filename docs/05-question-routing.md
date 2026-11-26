@@ -20,6 +20,7 @@
 | Kafka是做什么的？怎样保证消息不重不漏？ | [C09](chapters/09-distributed-systems.md) | C07；具体交付语义需按版本查证 |
 | CAP是不是三选二？ | [C09](chapters/09-distributed-systems.md) | [技术史常见误区](01-source-review.md) |
 | 模型训练、推理、微调、RL区别是什么？ | [C10](chapters/10-math-and-ml.md) | C11、C12 |
+| 1 TB训练数据、MoE、LoRA、大小模型协同、训练闭环怎样理解？ | [行业模型研发与数据进化闭环](16-model-training-and-data-loop.md) | C10、C11、C12、C14；型号按官方资料复核 |
 | 准确率很高，为什么仍不能验收？ | [C10](chapters/10-math-and-ml.md) | C13 |
 | RAG、embedding、Qdrant、MinerU在流程中哪一段？ | [C11](chapters/11-llm-and-rag.md) | C07；产品细节查其当时官方文档 |
 | 已经有工作流，为什么还要Agent？ | [C12](chapters/12-agents.md) | C08、C09 |
