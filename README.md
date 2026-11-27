@@ -12,6 +12,8 @@
 
 **[行业模型研发与数据进化闭环](docs/16-model-training-and-data-loop.md)** · 用虚构园区案例理解 TB、tokens、参数、MoE、微调、后训练、大小模型协作，以及从业务证据到训练与评测的闭环。
 
+**[Agent 商业化与数据价值](docs/17-agent-commercialization-and-data-value.md)** · 从业务决策反推数据契约、评测与交付，理解计费单位、另类数据及跨场景复用，并跟踪公开商业案例。
+
 ## 从哪里开始
 
 | 需要 | 入口 |
