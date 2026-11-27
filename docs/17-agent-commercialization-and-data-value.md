@@ -20,12 +20,12 @@
 
 [OGC SensorThings API](https://ogcapi.ogc.org/sensorthings/overview.html)将Thing、Location、Sensor、ObservedProperty、Observation与FeatureOfInterest等概念分开；[W3C PROV-DM](https://www.w3.org/TR/prov-dm/)描述实体、活动、责任主体与派生关系。这些标准分别支持观测组织与数据溯源，**并不规定上述五项价值的排名**。
 
-最小数据契约：对象和位置ID、观察时间/入库时间、属性与单位、采样方式、质量标记、来源及版本、授权用途、访问与保存规则。区分原始证据、结构化观测、派生指标与模型推断。授权读取不自动授权公开、再分发或训练；遵循目的限制、最小化、撤回、保留期和适用法律。公共场所可见不等于可任意处理个人数据。
+最小数据契约：对象和位置ID、观察时间/入库时间、属性与单位、采样方式、质量标记、来源及版本、授权用途、访问与保存规则。区分原始证据、结构化观测、派生指标与模型推断。授权读取不自动授权公开、再分发或训练；遵循目的限制、最小化、撤回、保留期和适用法律。公共场所可见不等于可任意处理个人数据。英国ICO关于[Agentic AI数据保护风险](https://ico.org.uk/about-the-ico/research-reports-impact-and-evaluation/research-and-reports/technology-and-innovation/tech-horizons-and-ico-tech-futures/ico-tech-futures-agentic-ai/data-protection-and-privacy-risks)讨论目的限制和数据最小化；不同司法辖区须另核当地适用规则。
 
 ## 3. 另类数据、代理变量和证据
 另类数据是相对于传统信息源而言的非传统数据，例如经合法取得的聚合空间统计。假设观察到展馆商店一日有200次进店、经授权的聚合交易数据显示60单，则样本期间每次进店对应0.30单；如果当天部分交易来自线上订单，0.30就不能称作纯到店转化率。客流不是订单，订单不是利润。
 
-分层抽样应先定总体、时间和空间分层、选样机制、缺失处理及误差范围。样本量大不能消除非随机缺失或系统误差；重复观测可能相关。用独立来源校验指标，记录不能判断的部分；相关变化不等于因果。不要用未经授权的人员跟踪做教学采集。
+分层抽样应先定总体、时间和空间分层、选样机制、缺失处理及误差范围。样本量大不能消除非随机缺失或系统误差；重复观测可能相关。用独立来源校验指标，记录不能判断的部分；相关变化不等于因果。不要用未经授权的人员跟踪做教学采集。[美国劳工统计局对抽样与非抽样误差的说明](https://www.bls.gov/cex/ce-standarderrors.htm)及[无应答率说明](https://www.bls.gov/cps/methods/response_rates.htm)支持样本量与缺失偏差应分别考虑；其说明针对调查，迁移到传感数据需明确新的测量机制。
 
 历史案例边界：美国SEC于2020-12-16发布[瑞幸财务造假指控及和解公告](https://www.sec.gov/newsroom/press-releases/2020-319)，公司不承认或否认指控并同意和解；其后续[2025财年20-F](https://www.sec.gov/Archives/edgar/data/1767582/000110465926035712/lk-20251231x20f.htm)披露经营已发生变化。两类来源对应不同时间与问题，证明历史调查与远期商业预测不能互相替代。此处不复刻第三方调查数据、人员观察或报告全文。
 
@@ -52,6 +52,8 @@
 ## 7. 前沿案例（滚动核查）
 **计费机制快照｜2026-11-27核查。** Salesforce 官方[Agentforce 定价](https://www.salesforce.com/agentforce/pricing/)与[2025-05-19帮助说明](https://help.salesforce.com/s/articleView?id=004811240&language=en_US&type=1)展示按动作消耗积分和按对话、席位等计费方式。帮助文档的历史费率不能直接作为报价，实际以当前合同/产品和适用范围为准。两份材料来自同一厂商，只证明其公布的计费机制，不证明真实付费、利润、续费或客户ROI。教学启示：报价单位与业务验收单位应分开定义。需求和采购证据未知。
 
+**数据订阅机制快照｜2026-11-27核查。** [AWS Data Exchange订阅文档](https://docs.aws.amazon.com/data-exchange/latest/userguide/product-subscriptions.html)说明价格、期限、数据订阅协议、版本与授权访问；[API产品发布文档](https://docs.aws.amazon.com/data-exchange/latest/userguide/publish-API-product.html)支持合同、按量或组合计价。教学启示：数据集、版本、产品权益和交付接口必须分开；订阅到期后导出数据的处理仍受协议约束。此为平台公开机制，买方成交量、具体效果及供方利润未知，不是商业成功证明。
+
 未来案例记录格式：日期、原始来源、买方及业务动作、产品形态、计费单位、数据权利与质量、效果指标及证据级别、单位经济性和复制条件；未知保持未知。优先核对客户披露、监管/财务文件、标准或独立评估，不用新闻热度替代效果。
 
 ## 自测
@@ -63,4 +65,4 @@
 回答应说明数据口径、基线、权限、业务结果和不确定性。可把虚构任务写成一页契约，并向同伴解释失败边界。
 
 ## 来源及审校范围
-2026-11-27核查上述OGC概览、W3C PROV概览及数据模型、NIST Measure页面、Anthropic文章、OpenAI评测和轨迹评分文档、Salesforce官方定价与帮助说明、SEC公告及2025年20-F相关披露。标准/监管/公司文件各支持其具体口径；教学框架与算例为独立归纳，未测试真实部署或证明商业收益。未使用任何私有项目、客户资料或内部调查表。
+2026-11-27核查上述OGC概览、W3C PROV概览及数据模型、NIST Measure页面、Anthropic文章、OpenAI评测和轨迹评分文档、Salesforce官方定价与帮助说明、SEC公告及2025年20-F相关披露、BLS抽样与无应答说明、ICO风险说明、AWS Data Exchange订阅与API产品文档。标准/监管/公司文件各支持其具体口径；教学框架与算例为独立归纳，未测试真实部署或证明商业收益。未使用任何私有项目、客户资料或内部调查表。
