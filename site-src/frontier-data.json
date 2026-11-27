@@ -1,12 +1,130 @@
 {
   "schemaVersion": 1,
-  "checkedAt": "2026-11-24",
-  "updatedAt": "2026-11-24",
+  "checkedAt": "2026-11-27",
+  "updatedAt": "2026-11-27",
   "updatePolicy": {
     "mode": "scheduled",
     "scheduleLabel": "每周二、周五 09:00（北京时间）"
   },
   "entries": [
+    {
+      "id": "pydantic-pax-harness-beta-20261125",
+      "date": "2026-11-25",
+      "dateLabel": "公告",
+      "vendor": "Pydantic AI",
+      "status": "preview",
+      "statusLabel": "Beta · Harness 尚未到 1.0",
+      "title": "Pax：把编码 Agent 本身也做成可替换插件",
+      "summary": "Pydantic AI 于 11 月 25 日发布终端编码助手 Pax，基于 Harness SDK。它让开发者分别组合模型、工具、插件、执行环境和终端界面；SDK 的 1.0 仍在准备中。",
+      "mechanism": "SDK 将工具、指令和运行钩子组合为 capability；Pax 再将能力装配为可启停的插件，也可直接载入开发者定义的 Agent。统一 workspace 接口让同一组文件与命令工具在本地或沙箱执行；默认 code mode 可用受限 Python 程序组织多次工具调用。SDK 支持持久执行，Pax 可恢复会话或接回沙箱。",
+      "example": "虚构教学例：给课程代码审查员配置只读工具和测试能力，再给修复员配置独立沙箱；两者复用同一个终端入口，比较各自的权限、执行轨迹和验收结果。",
+      "boundary": "SDK 的故障后持久执行尚未进入 Pax；Pax 的电脑操作命令也属于下一版本计划，而非本次已交付功能。切换沙箱有环境与同步条件，插件不天然可信。官方比较是单轮指定评测，完整方法尚待发布；本站未安装或运行。",
+      "sources": [
+        {
+          "label": "Pydantic 官方公告：2026-11-25",
+          "url": "https://pydantic.dev/articles/pax-harness-beta"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/i5qr52169dlque8rb2sl4i5jo"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/05-operating-systems.md",
+        "docs/chapters/08-software-engineering.md",
+        "docs/chapters/09-distributed-systems.md"
+      ]
+    },
+    {
+      "id": "anthropic-mcp-tasks-skills-20261124",
+      "date": "2026-11-24",
+      "dateLabel": "公告",
+      "vendor": "Anthropic",
+      "status": "released",
+      "statusLabel": "Tasks / Elicitation GA · Skills Beta",
+      "title": "Claude MCP：服务端可以带技能、接长任务、请求用户输入",
+      "summary": "11 月 24 日 Claude 宣布 MCP Tasks 和 Elicitation 正式可用，同时开放 Skills over MCP 公测。连接器不仅提供单次工具调用，还能承接耗时工作并在中途与人交互。",
+      "mechanism": "服务端可同时发布工具和操作指南，客户端按需加载技能。Tasks 让服务端承接长耗时操作或自己的 Agent 循环，Claude 可先处理其他工作，再取回任务结果；Elicitation 允许服务端在缺少输入或需要确认时暂停，通过表单或链接收集信息后继续。",
+      "example": "虚构教学例：学习助手把一百份公开练习的检查交给评测服务，同时整理课程目录；评测服务提供评分规则技能，必要时询问用户选择评分标准，最后返回结果供主助手复核。",
+      "boundary": "Tasks 和 Elicitation 在 Pro、Max、Ultra 的 Claude 与 Claude Code 正式开放，组织版逐步推出；Skills 仍是公测，Team 需管理员启用，Enterprise 尚待开放。公告所述 MCP File Uploads 扩展仍属即将推出；与已经开始公测的目录连接器文件传输不能混同。异步不等于自动重试安全、权限隔离或结果正确；需兼容服务端，本站未实测。",
+      "sources": [
+        {
+          "label": "Claude 官方公告：2026-11-24",
+          "url": "https://claude.com/resources/articles/skills-over-mcp-tasks-and-more"
+        },
+        {
+          "label": "Claude Code MCP 官方文档",
+          "url": "https://code.claude.com/docs/en/mcp"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/kjd2qp2iuk9zxdfqj5qk2a8f9"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/06-networks.md",
+        "docs/chapters/09-distributed-systems.md",
+        "docs/chapters/13-security-and-reliability.md"
+      ]
+    },
+    {
+      "id": "anthropic-artifact-desktop-app-20261124",
+      "date": "2026-11-24",
+      "dateLabel": "公告",
+      "vendor": "Anthropic",
+      "status": "preview",
+      "statusLabel": "Beta · Mac / Windows 逐步开放",
+      "title": "Claude Artifacts：从聊天产物到有权限边界的桌面应用",
+      "summary": "11 月 24 日 Claude 开始推出 Install as app 公测，可把支持的 artifact 安装成独立窗口应用，调用 Claude 和已连接服务，并随底层 artifact 更新。",
+      "mechanism": "应用默认只有浏览器级能力；额外授权可提供通知、全局快捷键等系统接口；完整电脑访问则允许程序在获准后执行命令和读写文件。权限绑定当前应用版本，更新后重新申请；组织管理员可以限制授权范围。",
+      "example": "虚构教学例：将课程复习面板装为桌面应用，让它读取已授权的公开课程清单并发送练习提醒。只允许通知，不授予完整文件系统权限；更新后重新审查所请求的能力。",
+      "boundary": "需要 Claude Desktop、在线登录及支持的 artifact，模型请求计入套餐用量。完整访问只可授予自建或组织内应用；第三方网页组件可能在不触发重新授权的情况下变化，官方不逐个审查应用。不能视为安全沙箱或独立离线软件；部分组织部署不支持，本站未安装测试。",
+      "sources": [
+        {
+          "label": "Claude 官方公告：2026-11-24",
+          "url": "https://claude.com/resources/articles/install-as-app"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/zcpto4b7qb8sr6v6n223kd2sx"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/05-operating-systems.md",
+        "docs/chapters/13-security-and-reliability.md"
+      ]
+    },
+    {
+      "id": "anthropic-connector-file-transfer-20261124",
+      "date": "2026-11-24",
+      "dateLabel": "公告",
+      "vendor": "Anthropic",
+      "status": "preview",
+      "statusLabel": "Beta · 指定目录连接器",
+      "title": "Claude 连接器文件传输：从传文本到交付实际文件",
+      "summary": "11 月 24 日官方更新记录确认连接器文件传输开始公测。Claude 可以向支持文件功能的目录连接器发送生成物，或将服务端提供的文件保存至会话或本地 Claude Code 下载目录。",
+      "mechanism": "由连接器工具承担文件上传或下载；每个应用首次发送需用户确认，后续按工具权限处理。组织管理员可分别开启上传与下载。传输经过服务端，下载到本地的文件和保存于会话的文件有不同生命周期。",
+      "example": "虚构教学例：把生成的公开练习题表发送到获准的教学资料库，确认目标目录和文件版本，再从资料库取回文件比较内容；如果发送中断先检查是否已经收到，避免重复上传。",
+      "boundary": "仅支持目录中已适配文件传输的连接器，自定义 MCP 服务、计划任务和 Remote Control 会话目前不支持；Claude Code 的 API key 或云厂商登录也不支持。组织版默认关闭，部分合规设置不兼容。删除聊天不会删除外部应用的副本。本站未执行传输。",
+      "sources": [
+        {
+          "label": "Claude 官方文件传输帮助",
+          "url": "https://support.claude.com/en/articles/18534325-send-files-to-connected-apps-and-save-files-from-them"
+        },
+        {
+          "label": "AIHOT 发现线索",
+          "url": "https://aihot.news/items/w9zx5w4dj1xhxvjylbijskshq"
+        }
+      ],
+      "related": [
+        "docs/chapters/12-agents.md",
+        "docs/chapters/06-networks.md",
+        "docs/chapters/13-security-and-reliability.md"
+      ]
+    },
     {
       "id": "anthropic-claude-ship-20261123",
       "date": "2026-11-23",
