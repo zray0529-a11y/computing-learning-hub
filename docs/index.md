@@ -4,6 +4,7 @@
 - [Agent 前沿补充章](15-agent-frontier.md)：区分模型、智能体与运行框架，理解协作、工具、记忆及验证。
 
 - [行业模型研发与数据进化闭环](16-model-training-and-data-loop.md)：训练规模、参数适配、模型路由、数据治理与独立评测。
+- [Agent 商业化与数据价值](17-agent-commercialization-and-data-value.md)：业务动作、数据质量、定价、证据和评测驱动迭代。
 - [00 知识总览](00-overview.md)：按基础、建筑分类和实际问题选择入口。
 - [01 技术史常见误区](01-source-review.md)：核对十类年份、定义、条件与证据混淆。
 - [02 历史与概念地图](02-history-and-map.md)：理解不同技术解决的问题及学习依赖。
